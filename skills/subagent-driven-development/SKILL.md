@@ -19,7 +19,11 @@ Execute plan by dispatching fresh subagent per task, with two-stage review after
 
 Each agent's discipline is baked into its own definition — you dispatch them bare, no prompt template needed.
 
+**Why these are *different* agents, not one agent wearing hats:** a reviewer who shares context with the implementer has just as much invested in the implementation being right — they wrote it, or they're about to, or it's polluting their window. The bias isn't dishonesty; it's that the same context that produced the work can't cleanly judge it. Splitting implementer / spec-reviewer / quality-reviewer into separate fresh contexts means each one sees the work without the residue of having produced it. scorpio isn't smarter than capricorn about the code — it's *independent* of capricorn about the code, which is the one thing capricorn can't be about its own work.
+
 **Continuous execution:** Do not pause to check in with your human partner between tasks. Execute all tasks from the plan without stopping. The only reasons to stop are: BLOCKED status you cannot resolve, ambiguity that genuinely prevents progress, or all tasks complete. "Should I continue?" prompts and progress summaries waste their time — they asked you to execute the plan, so execute it.
+
+**Why continuous, not check-in-per-task:** each "should I continue?" forces a human context-switch — they have to reload what the plan was, where you are, and what "continue" even means, to answer a question whose answer is almost always "yes, that's why I gave you a plan." The plan is the consent; approving it was the check-in. Stopping to re-confirm per task trades the user's attention (scarce, expensive to re-engage) for a safety that the plan + review gates already provide. Pause only when the plan turns out to be wrong, which is exactly the three stop conditions listed.
 
 ## When to Use
 
@@ -272,14 +276,14 @@ Done!
 - Start implementation on main/master branch without explicit user consent
 - Skip reviews (spec compliance OR code quality)
 - Proceed with unfixed issues
-- Dispatch multiple implementation subagents in parallel (conflicts)
-- Make subagent read plan file (provide full text instead)
+- Dispatch multiple implementation subagents in parallel (conflicts) — *why: two implementers editing the same working tree race on files; whoever writes last wins silently, and the other's changes vanish or corrupt. The isolation is the point of subagents, but it only holds one editor at a time per tree.*
+- Make subagent read plan file (provide full text instead) — *why: a Read of the plan pulls the whole plan into the subagent's context, including every other task it isn't doing, diluting focus and letting it "helpfully" implement adjacent work. Passing only its task's text scopes its world to exactly its job.*
 - Skip scene-setting context (subagent needs to understand where task fits)
 - Ignore subagent questions (answer before letting them proceed)
 - Accept "close enough" on spec compliance (spec reviewer found issues = not done)
 - Skip review loops (reviewer found issues = implementer fixes = review again)
 - Let implementer self-review replace actual review (both are needed)
-- **Start code quality review before spec compliance is ✅** (wrong order)
+- **Start code quality review before spec compliance is ✅** (wrong order) — *why: taurus reviewing code that doesn't meet spec wastes a review — the code might be well-written but implementing the wrong thing, and quality feedback on wrong behavior is throwaway work. Confirm the code does the right thing (scorpio) before judging whether it does it well (taurus).*
 - Move to next task while either review has open issues
 - **Skip aries when the Aries Gate fires** — high-risk surface tasks must be adversarially tested, not just code-reviewed
 - **Auto-dispatch aries for low-risk tasks** — don't waste a sonnet round-trip on pure refactor or doc-only changes; only fire when the gate says so
