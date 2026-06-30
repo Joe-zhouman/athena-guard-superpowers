@@ -19,8 +19,6 @@ This is not negotiable. This is not optional. You cannot rationalize your way ou
 
 ## Instruction Priority
 
-## Instruction Priority
-
 When instructions conflict, resolve by this priority:
 
 1. **User's explicit instructions** (CLAUDE.md, direct requests) — highest priority
