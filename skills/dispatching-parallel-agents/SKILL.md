@@ -13,6 +13,8 @@ When you have multiple unrelated failures (different test files, different subsy
 
 **Core principle:** Dispatch one agent per independent problem domain. Let them work concurrently.
 
+**Why one-agent-per-domain, not one-agent-for-everything:** a single agent holding multiple independent problems has to context-switch between them, and each switch costs focus — it starts confusing the constraints of problem A with problem B, applying one fix's assumptions to another, and its context fills with the noise of all of them interleaved. Splitting by domain gives each agent one problem and the full context window to hold it, which is the condition under which an agent actually solves hard things. The parallelism is a bonus; the real win is that a focused agent is smarter than a scattered one. And your own context stays clean for integration, instead of being filled with every problem's investigation details.
+
 ## When to Use
 
 ```dot
@@ -111,17 +113,12 @@ Return: Summary of what you found and what you fixed.
 
 ## Common Mistakes
 
-**❌ Too broad:** "Fix all the tests" - agent gets lost
-**✅ Specific:** "Fix agent-tool-abort.test.ts" - focused scope
-
-**❌ No context:** "Fix the race condition" - agent doesn't know where
-**✅ Context:** Paste the error messages and test names
-
-**❌ No constraints:** Agent might refactor everything
-**✅ Constraints:** "Do NOT change production code" or "Fix tests only"
-
-**❌ Vague output:** "Fix it" - you don't know what changed
-**✅ Specific:** "Return summary of root cause and changes"
+| Mistake | Fix | Why |
+|---------|-----|-----|
+| **Too broad:** "Fix all the tests" — agent gets lost | **Specific:** "Fix agent-tool-abort.test.ts" — focused scope | A broad scope gives the agent permission to wander, and it will — touching files tangential to the real problem, "improving" things along the way, and burning its whole context budget without converging. Specific scope is a constraint that keeps its effort pointed at one thing, which is the only way it finishes. |
+| **No context:** "Fix the race condition" — agent doesn't know where | **Context:** Paste the error messages and test names | The agent has no conversation history — it wasn't here when the bug appeared. "The race condition" means nothing to it without the failing test, the error output, and the reproduction. Under-specified context forces it to re-discover what you already know, which costs a round-trip and often re-discovers it wrong. |
+| **No constraints:** Agent might refactor everything | **Constraints:** "Do NOT change production code" or "Fix tests only" | Without a constraint, the agent optimizes for the literal goal ("make tests pass") by any means, which includes weakening assertions, deleting failing tests, or rewriting production code to match the test. The constraint closes off the shortcuts that would "succeed" without actually fixing the bug. |
+| **Vague output:** "Fix it" — you don't know what changed | **Specific:** "Return summary of root cause and changes" | After the agent returns, *you* have to integrate and trust the result. A vague return ("done") leaves you re-reading the entire diff to figure out what it did and why. A structured return (root cause + changes) lets you verify the fix is real without reconstructing the agent's reasoning from the code. |
 
 ## When NOT to Use
 
