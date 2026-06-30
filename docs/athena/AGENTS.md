@@ -51,6 +51,7 @@
 ### aries — 对抗测试者
 - 声称"done"且要确认扛得住时
 - 边界值、状态机破坏、并发混乱、资源耗尽、输入攻击
+- **athena 特有维度**:对 `skills/` / `.claude/agents/` / `hooks/` / MCP 配置的改动做 prompt injection / skill 劫持 / MCP 投毒 / 跨 agent 污染审查
 - 报告写 `docs/superpowers/reviews/<task>-adversarial.md`
 - **不派**:happy path 验证(归 capricorn)
 

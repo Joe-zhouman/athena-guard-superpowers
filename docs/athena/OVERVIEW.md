@@ -27,7 +27,7 @@
 |----------|------|------|--------|
 | [virgo](../../.claude/agents/virgo.md) | 留档探索者 | 项目级代码地图、流追踪、模式编目,**写 findings-local.md** | 大项目摸底、跨 session 重建 context |
 | [sagittarius](../../.claude/agents/sagittarius.md) | 追根溯源的研究者 | 外部资料、库怎么用、多源交叉、必引证 | capricorn 报 NEEDS_CONTEXT、外部依赖调研 |
-| [aries](../../.claude/agents/aries.md) | 对抗性的破坏者 | 边界测试、并发混乱、资源耗尽、输入攻击 | 声称"done"后验证扛得住 |
+| [aries](../../.claude/agents/aries.md) | 对抗性的破坏者 | 边界测试、并发混乱、资源耗尽、输入攻击 + **skills/agents/hooks/MCP 对抗审查** | 声称"done"后验证扛得住;改 skills/agents/hooks/MCP 时**强制派** |
 | [pisces](../../.claude/agents/pisces.md) | 克制的润色者 | 文本润色、去 AI 味、代码+非代码 | 已有文档需要听起来像人话 |
 
 ## 持久化架构(subagent 写盘,主 agent 读盘)

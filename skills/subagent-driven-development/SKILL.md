@@ -11,10 +11,11 @@ Execute plan by dispatching fresh subagent per task, with two-stage review after
 
 **Core principle:** Fresh subagent per task + two-stage review (spec then quality) = high quality, fast iteration
 
-**Athena wiring:** The three roles below are filled by dedicated single-purpose agents (not general-purpose with inline prompts):
+**Athena wiring:** The four roles below are filled by dedicated single-purpose agents (not general-purpose with inline prompts):
 - **capricorn** — the implementer (executes one task, TDD, self-reviews, commits)
 - **scorpio** — the spec-compliance reviewer (verifies code matches spec, does NOT trust the implementer's report)
 - **taurus** — the code-quality reviewer (runs only AFTER scorpio passes)
+- **aries** — the adversarial tester (runs AFTER taurus passes, **only when the task touches a high-risk surface** — see Aries Gate below)
 
 Each agent's discipline is baked into its own definition — you dispatch them bare, no prompt template needed.
 
@@ -64,6 +65,10 @@ digraph process {
         "Dispatch taurus (code-quality reviewer)" [shape=box];
         "taurus approves?" [shape=diamond];
         "capricorn fixes quality issues" [shape=box];
+        "Task touches high-risk surface?\n(see Aries Gate below)" [shape=diamond];
+        "Dispatch aries (adversarial tester)" [shape=box];
+        "aries verdict?" [shape=diamond];
+        "capricorn fixes breakage" [shape=box];
         "Mark task complete in TodoWrite" [shape=box];
     }
 
@@ -85,7 +90,13 @@ digraph process {
     "Dispatch taurus (code-quality reviewer)" -> "taurus approves?";
     "taurus approves?" -> "capricorn fixes quality issues" [label="no"];
     "capricorn fixes quality issues" -> "Dispatch taurus (code-quality reviewer)" [label="re-review"];
-    "taurus approves?" -> "Mark task complete in TodoWrite" [label="yes"];
+    "taurus approves?" -> "Task touches high-risk surface?\n(see Aries Gate below)" [label="yes"];
+    "Task touches high-risk surface?\n(see Aries Gate below)" -> "Dispatch aries (adversarial tester)" [label="yes"];
+    "Task touches high-risk surface?\n(see Aries Gate below)" -> "Mark task complete in TodoWrite" [label="no"];
+    "Dispatch aries (adversarial tester)" -> "aries verdict?";
+    "aries verdict?" -> "capricorn fixes breakage" [label="BREAKABLE"];
+    "capricorn fixes breakage" -> "Dispatch aries (adversarial tester)" [label="re-test"];
+    "aries verdict?" -> "Mark task complete in TodoWrite" [label="SOLID"];
     "Mark task complete in TodoWrite" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch capricorn (implementer)" [label="yes"];
     "More tasks remain?" -> "Dispatch taurus for final whole-implementation review" [label="no"];
@@ -100,6 +111,25 @@ Dispatch bare — no prompt template. The agent's own definition carries the dis
 - **capricorn**: `Agent(subagent_type="capricorn", description="Implement Task N: <name>", prompt="<full task text from plan>\n\n## Context\n<where it fits, dependencies>")`
 - **scorpio**: `Agent(subagent_type="scorpio", description="Spec review Task N", prompt="Spec:\n<full task text>\n\nImplementer claims:\n<capricorn's report>\n\nGit range: BASE <sha> HEAD <sha>")`
 - **taurus**: `Agent(subagent_type="taurus", description="Code quality review Task N", prompt="BASE <sha> HEAD <sha>")` — taurus reads the diff itself
+- **aries** (only if Aries Gate fires): `Agent(subagent_type="aries", description="Adversarial test Task N: <name>", prompt="Target: <what was built, where it lives>.\nRisk surface I am worried about: <which of the 5 high-risk categories apply>.\nGit range: BASE <sha> HEAD <sha>. Write report to docs/superpowers/reviews/<task>-adversarial.md.")`
+
+### Aries Gate — when to dispatch aries
+
+aries costs a sonnet round-trip per dispatch. Don't dispatch it for tasks that can't break in interesting ways. **Dispatch aries when the task touches ANY of these high-risk surfaces:**
+
+| # | High-risk surface | Why it needs runtime attack |
+|---|-------------------|-----------------------------|
+| 1 | **Concurrency / threading / async shared state** | Race conditions, deadlocks, and torn writes only show when you actually run things concurrently. Static review sees none of it. |
+| 2 | **External input** (user input, API requests, file parsing, network data, deserialization) | Untrusted data is where injection, overflow, and parser bugs live. taurus can suspect; aries confirms by feeding hostile payloads. |
+| 3 | **State machine / lifecycle** (init/shutdown, session lifecycle, order-dependent calls) | "Call this before that" contracts fail in real call orders. aries calls things out of order and watches. |
+| 4 | **Resource limits** (memory, disk, connections, file handles, timeouts) | Leaks and exhaustion only surface under pressure. aries applies the pressure. |
+| 5 | **Skills / agents / MCP tools / hooks** (anything that shapes agent behavior or gates tool calls) | **Athena-specific.** Prompt injection, skill hijacking, MCP parameter poisoning, cross-agent context pollution, hook side-channels. SKILL.md and agent.md files are themselves an attack surface — they get injected at session start and shape every subsequent action. Bugs here are not runtime crashes; they're misaligned agent behavior that's hard to detect after the fact. |
+
+If the task touches none of these (pure calculation, refactoring a single function with no I/O, doc-only changes), **skip aries**. Mark the task complete after taurus passes.
+
+If the task touches any of these, dispatch aries and tell it which surfaces you want attacked. aries writes its report to `docs/superpowers/reviews/<task>-adversarial.md`; you read the verdict (SOLID → proceed; BREAKABLE → capricorn fixes → re-dispatch aries).
+
+**Note on surface 5:** for tasks that modify `skills/`, `.claude/agents/`, `hooks/`, or MCP server configs, aries is **mandatory, not optional** — these changes shape every future session, so a missed bug here is a recurring bug. Surface 5 always fires aries.
 
 ## Model Selection
 
@@ -251,6 +281,9 @@ Done!
 - Let implementer self-review replace actual review (both are needed)
 - **Start code quality review before spec compliance is ✅** (wrong order)
 - Move to next task while either review has open issues
+- **Skip aries when the Aries Gate fires** — high-risk surface tasks must be adversarially tested, not just code-reviewed
+- **Auto-dispatch aries for low-risk tasks** — don't waste a sonnet round-trip on pure refactor or doc-only changes; only fire when the gate says so
+- **Skip aries on changes to `skills/`, `.claude/agents/`, `hooks/`, or MCP configs** — surface 5 is mandatory, these shape every future session
 
 **If subagent asks questions:**
 - Answer clearly and completely
