@@ -218,8 +218,9 @@ already use it in another harness.
 - **subagent-driven-development** - Fast iteration with two-stage review (spec compliance, then code quality)
 
 **Meta**
-- **writing-skills** - Create new skills following best practices (includes testing methodology)
 - **using-superpowers** - Introduction to the skills system
+
+> Skill authoring is handled by the global **`skill-creator-plus`** skill, not bundled here.
 
 ## Philosophy
 
@@ -237,10 +238,8 @@ The general contribution process for Superpowers is below. Keep in mind that we 
 1. Fork the repository
 2. Switch to the 'dev' branch
 3. Create a branch for your work
-4. Follow the `writing-skills` skill for creating and testing new and modified skills
+4. Use the global **`skill-creator-plus`** skill for creating and testing new and modified skills
 5. Submit a PR, being sure to fill in the pull request template.
-
-See `skills/writing-skills/SKILL.md` for the complete guide.
 
 ## Updating
 
