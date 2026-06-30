@@ -11,6 +11,8 @@ Ensure work happens in an isolated workspace. Prefer your platform's native work
 
 **Core principle:** Detect existing isolation first. Then use native tools. Then fall back to git. Never fight the harness.
 
+**Why this order:** every layer here protects against a different failure. Detect-first prevents the most common disaster — creating a worktree *inside* an existing one, which produces a nested mess the harness can't track or clean up. Native-tools-before-git prevents phantom state: if your harness manages worktrees (via EnterWorktree or similar) and you bypass it with raw `git worktree add`, the harness doesn't know your worktree exists, so its cleanup, status, and finish-time logic all silently miss it — leaving orphaned directories that look like the harness lost track because it did. Git fallback is last resort precisely because it's invisible to the harness. The principle "never fight the harness" isn't deference — it's that the harness knows things about your workspace that git doesn't, and fighting it desynchronizes the two.
+
 **Announce at start:** "I'm using the using-git-worktrees skill to set up an isolated workspace."
 
 ## Step 0: Detect Existing Isolation
@@ -200,7 +202,7 @@ Ready to implement <feature-name>
 
 **Never:**
 - Create a worktree when Step 0 detects existing isolation
-- Use `git worktree add` when you have a native worktree tool (e.g., `EnterWorktree`). This is the #1 mistake — if you have it, use it.
+- Use `git worktree add` when you have a native worktree tool (e.g., `EnterWorktree`). This is the #1 mistake — if you have it, use it. *Why: the native tool is how the harness tracks the worktree's lifecycle. A git-created worktree is invisible to it — the harness won't clean it up on session exit, won't include it in status, and at finish-time may try to operate on a workspace it doesn't know exists. The "git way" looks equivalent but produces an orphan the harness can't manage.*
 - Skip Step 1a by jumping straight to Step 1b's git commands
 - Create worktree without verifying it's ignored (project-local)
 - Skip baseline test verification
