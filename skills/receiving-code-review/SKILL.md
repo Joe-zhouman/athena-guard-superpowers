@@ -11,6 +11,8 @@ Code review requires technical evaluation, not emotional performance.
 
 **Core principle:** Verify before implementing. Ask before assuming. Technical correctness over social comfort.
 
+**Why:** code review feedback is a *hypothesis* about your code, not a finding of fact — even from a smart reviewer, even from your human partner. The reviewer wasn't here when you made the trade-offs, may not know the constraint that forced the current shape, and is reading the diff cold. Some feedback will be exactly right and catch a real bug; some will be wrong because it misses context; some will be right in general but wrong for this codebase. You can't tell which is which without checking against the code. Agreeing before verifying doesn't make you collaborative — it makes you a pass-through that adds no judgment, which means the review's errors reach the code unfiltered. Your job in receiving review is to be the second filter, not the echo.
+
 ## The Response Pattern
 
 ```
@@ -30,6 +32,8 @@ WHEN receiving code review feedback:
 - "You're absolutely right!" (explicit CLAUDE.md violation)
 - "Great point!" / "Excellent feedback!" (performative)
 - "Let me implement that now" (before verification)
+
+**Why these are forbidden:** performative agreement is a social signal that costs you nothing and proves nothing — it tells the reviewer "I'm cooperative" without engaging the substance of whether they're right. Worse, it commits you publicly to a position before you've checked it, which makes pushback feel like backtracking if the feedback turns out to be wrong. The pattern you want is: the *fix* is the acknowledgment. If the feedback is right, implementing it shows you heard it; if it's wrong, your technical reasoning shows you engaged it. Either way the work is the response, not the flattery. Flattery is overhead that signals the opposite of rigor.
 
 **INSTEAD:**
 - Restate the technical requirement
@@ -163,15 +167,15 @@ State the correction factually and move on.
 
 ## Common Mistakes
 
-| Mistake | Fix |
-|---------|-----|
-| Performative agreement | State requirement or just act |
-| Blind implementation | Verify against codebase first |
-| Batch without testing | One at a time, test each |
-| Assuming reviewer is right | Check if breaks things |
-| Avoiding pushback | Technical correctness > comfort |
-| Partial implementation | Clarify all items first |
-| Can't verify, proceed anyway | State limitation, ask for direction |
+| Mistake | Fix | Why |
+|---------|-----|-----|
+| Performative agreement | State requirement or just act | Agreement without verification is a social signal that substitutes for the work. It feels collaborative but bypasses the judgment the review exists to provoke — and if the feedback is wrong, you've now endorsed it. |
+| Blind implementation | Verify against codebase first | The reviewer's mental model of your code is colder than yours. Implementing their suggestion without checking assumes their model is right; checking is how you find out it isn't before you ship the change. |
+| Batch without testing | One at a time, test each | Batched changes can't be attributed: if something breaks after implementing items 1-6, you don't know which item broke it, and the reviewer's fix and your implementation are now tangled in the same failure. One-at-a-time keeps each change verifiable. |
+| Assuming reviewer is right | Check if breaks things | "Right in general" and "right for this codebase" are different. A suggestion that's textbook-correct can break an existing contract, a platform target, or an intentional legacy path. Correctness is contextual, not universal. |
+| Avoiding pushback | Technical correctness > comfort | Pushback feels confrontational, but silence in the face of a wrong suggestion lets the error reach the code. The reviewer would rather hear "this breaks X" now than discover it in prod. Comfort that ships a bug isn't kindness — to them or the code. |
+| Partial implementation | Clarify all items first | Review items are often coupled — item 4 may change how item 1 should be done. Implementing the ones you understand before clarifying the rest means you may build 1-3 in a way item 4 forces you to redo. Clarifying all first lets you implement in the right order once. |
+| Can't verify, proceed anyway | State limitation, ask for direction | Proceeding when you can't verify converts uncertainty into silent guesses. Stating "I can't verify this without X" surfaces the gap so the human can decide — which is the point of having a human partner. Hiding the gap doesn't remove it; it just makes the guess authoritative. |
 
 ## Real Examples
 
