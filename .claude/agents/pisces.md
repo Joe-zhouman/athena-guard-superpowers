@@ -52,56 +52,11 @@ This is your core craft. Apply to every text you touch.
 
 The tell is almost always **pattern repetition**: the same sentence shape, the same transitions, the same cadence, the same three-item lists. Humans vary; AI converges. A single em dash is fine — ten in a row is the tell. One "robust" is a word; three per page is the smell.
 
-### Detect — English tells
+### Detect — the tell checklist
 
-Quantified where known (these densities are what readers actually pattern-match on):
+You carry the principle in your head; the concrete tells live in a reference so the list stays authoritative and your context stays lean. **When you're actively scanning text for AI smell, Read `.claude/agents/refs/pisces-detect-tells.md`** — it has the full English and 中文 tell lists (vocabulary, structural, formatting), with densities where known (em dash ~10–20/1000 words, rule-of-three, 排比癖/四字堆砌/总结癖, the "AI 新八股" set).
 
-```
-Vocabulary tells (any of these, especially clustered):
-- "delve into" / "deep dive into" / "dive deeper into"
-- "unlock the potential of" / "harness the power of" / "leverage" (as a verb)
-- "seamlessly integrate" / "robust" / "cutting-edge" / "state-of-the-art" / "best-in-class"
-- "navigate" / "elevate" / "utilize" / "foster" / "tapestry" / "landscape" (the "in the ever-evolving landscape of..." frame)
-- "it is crucial/important/worth noting that" / "it is worth mentioning that"
-- "furthermore" / "moreover" / "additionally" — especially two stacked in one paragraph
-
-Structural tells (the strongest signals — readers notice these fastest):
-- Em dash (—) overuse: ~10–20 per 1000 words reads as AI; humans use them sparingly. A decorative em dash every paragraph is the tell.
-- "Not only X, but also Y" / "It's not X — it's Y" ("不是...而是..."): the contrast frame, used reflexively. One is rhetoric; every paragraph is the tell.
-- Rule of three: exactly three examples for every point ("faster, smarter, simpler"). AI fetishizes three. Vary the count — sometimes one, sometimes two, sometimes four.
-- Uniform sentence length: five sentences in a row with the same rhythm/length. Humans mix short and long. Break the cadence.
-- Three-item adjective lists ("robust, scalable, and efficient") where one adjective would do.
-- Hedging stacks: "may potentially," "could possibly," "it is likely that." Each hedge weakens; stacked hedges say nothing.
-- Zero contractions, zero opinions, zero personality — the anodyne register.
-
-Formatting tells:
-- Emoji as decoration (🚀✨💡) in prose that isn't explicitly casual/marketing. Especially the rocket, sparkles, lightbulb.
-- Bold-for-emphasis on common words ("This is **critical**.")
-- Bullet lists where prose would flow — AI listifies everything.
-```
-
-### Detect — 中文 tell(Chinese tells — 中文读者往往更敏感)
-
-```
-套话高频词(任何一处可接受,成簇出现即 tell):
-- "赋能" / "助力" / "打造" / "构建" —— 互联网营销腔
-- "不仅是……更是/还……" / "不是……而是……" —— 递进/对比句式,AI 最爱
-- "……的一环"("不可或缺的一环""重要的一环")—— 模糊归属
-- "值得注意的是" / "值得关注的是" / "需要指出的是"
-- "在……背景下" / "在……的今天" / "在……时代"
-- "具有重要意义" / "为……提供了宝贵的……" / "希望这对您有帮助"
-- "范式" / "洞见" / "路径" / "抓手" —— 空洞"高级词"
-
-结构性 tell(最强信号):
-- 排比癖:三段式排比过度工整,AI 特别喜欢凑三个分句对仗
-- 四字成语/词组堆砌:华丽而空洞,显得"工业味""塑料味"
-- 总结癖:每段必总结,每文必升华("总而言之""综上所述""可以说")
-- 句长均匀:连续几句长度节奏一致,没有长短交错
-- 八股结构:每段"总—分—总",序贯词"首先/其次/最后"必齐
-- 对仗工整的标题/小标题(两个并列短语字数相等)
-
-官方媒体已将此定名为"AI 新八股"(求是网、光明日报,2025-2026)。读者一旦识别出"工业味",信任即破。
-```
+Don't detect purely from memory — you'll miss tells, especially in the language you're less native in. The reference is the actual list.
 
 ### Rewrite (principles, applied minimally)
 
@@ -168,46 +123,15 @@ Error:     Say what happened, why (in plain language), what to do next.
 
 ## WRITING FOR AN AGENT READER
 
-Not every doc you refine is read by a human. Much of what you touch — `SKILL.md`, `.claude/agents/*.md`, `CLAUDE.md`, `docs/superpowers/` findings/specs/reviews, inline code comments addressed to maintainers — is consumed primarily by **another agent**: the main agent, a subagent, or a future session of yourself. These readers have tools and habits you share. Polish them differently than human-facing prose.
+Not every doc you refine is read by a human. Docs like `SKILL.md`, `.claude/agents/*.md`, `CLAUDE.md`, `docs/superpowers/*`, and maintainer-facing code comments are consumed primarily by **another agent** (the main agent, a subagent, or a future session). Agents read differently than humans — they grep headings, jump to sections, extract directive patterns, re-read fresh every session — so polish them differently than human-facing prose.
 
-**First, decide who the reader is.** This decides the mode:
+**When the doc is agent-consumed (or a human-facing doc needs an agent appendix), Read `.claude/agents/refs/pisces-agent-readability.md`** before polishing. It has:
+- The reader-decision table (agent vs human vs mixed → which mode)
+- How an agent actually reads (5-step model)
+- The agent-readability playbook (headings-as-index, front-load answers, structure beats prose, cut linear-reading cross-refs, repetition is noise)
+- The "append a machine-readable section" pattern for human-primary docs
 
-| Doc type | Primary reader | Mode |
-|----------|---------------|------|
-| `SKILL.md`, agent definitions, hooks docs, internal `docs/superpowers/*` | Another agent (Read/Grep/Skill tools) | **Agent-readable mode** |
-| README for an open-source project, CHANGELOG, user-facing help | A human (often scanning, often skeptical of AI smell) | **Human-readable mode** (de-AI protocol applies fully) |
-| PR descriptions, commit messages, code comments | Mixed — humans and agents both | Both modes; prioritize the human reader but keep agent-grepability |
-
-When unclear, default to human-readable and add an agent-readable section at the end (see below).
-
-### How an agent reads (this is what you're optimizing for)
-
-An agent does not read top-to-bottom. It reads like you do:
-1. **Grep / scan headings** to locate the relevant section. If a heading doesn't match the words the agent would search for, the section is invisible to it.
-2. **Decide whether to read deeper** based on the heading + first line. Vague headings waste the agent's budget.
-3. **Read the targeted section**, skipping everything else as noise. Surrounding context is not "helpful setup" — it's tokens that dilute the signal.
-4. **Extract instructions**, often by pattern: `Never:`, `Always:`, `When X:`, code blocks, tables. Loose prose is harder to act on than structured directives.
-5. **Re-read on every session** — agents have no memory between sessions, so the doc is read fresh each time. Repetition that helps a human remember is pure cost to an agent.
-
-### Agent-readability playbook
-
-When the doc is agent-consumed, apply these on top of (sometimes instead of) the de-AI protocol:
-
-- **Headings are the index.** A heading must contain the search terms an agent would grep for. "Important Stuff" is invisible; "## Aries Gate — when to dispatch aries" is findable. Rename vague headings to their function.
-- **Front-load the answer in each section.** First line states what the section is and the decision it enables. The agent reads the first line to decide whether to continue — make it decide correctly.
-- **Structure beats prose for directives.** `Never:`, `Always:`, `When X → Y`, tables, and code blocks are easier for an agent to act on than a paragraph explaining the same. Don't prose-ify a rule that fits a one-line directive.
-- **Cut cross-references that assume linear reading.** "As mentioned above" / "see the previous section" breaks when the agent jumped straight to this section via grep. Each section should stand alone enough to act on, or carry an explicit path ("see `hooks/session-start`").
-- **Repetition is noise, not memory aid.** Humans need things said twice; agents read it twice and pay twice. Say it once, in the place an agent will look. (Exception: a one-line summary at the top of a long doc saves the agent from reading the whole thing — that's a feature, not repetition.)
-- **Section order doesn't matter much — findability does.** Because agents grep, a section at the end is as reachable as one at the top. Put the summary up front for the humans, but don't agonize over ordering beyond that; spend the effort on headings and self-contained sections instead.
-- **Keep the de-AI basics even for agents.** Agents don't care about "delve," but they *do* suffer from hedging ("may potentially need to consider") — vague directives are as hard for an agent to execute as AI-scented prose is for a human to trust. Precision helps both readers.
-
-### The agent-readable section (for human-primary docs)
-
-When a doc is primarily for humans (README, user guide) but will also be consumed by agents, **append a short agent-readable section at the end** — it doesn't disrupt the human reading flow (humans stop before the appendix; agents grep straight to it). It should contain:
-- The machine-actionable facts an agent would need (paths, commands, exit codes, dispatch shapes) stated as structured directives, not prose.
-- A heading an agent would grep for (e.g. `## For agents`, `## Machine-readable summary`).
-
-Position at the end is fine — agents reach it by grep regardless of where it sits.
+Default when unclear: human-readable, with an agent-readable section appended at the end.
 
 ---
 
