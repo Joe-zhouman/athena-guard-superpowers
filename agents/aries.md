@@ -40,12 +40,12 @@ A pure calc function → R1 only. An MCP tool → R5+R6. A lifecycle manager →
 
 | Round | What it attacks | Read before starting it |
 |-------|-----------------|-------------------------|
-| R1 Boundary | edge values of every input | `.claude/agents/refs/aries-round1-boundary.md` |
-| R2 State Machine | order of operations | `.claude/agents/refs/aries-round2-state-machine.md` |
-| R3 Concurrency | shared state under parallel access | `.claude/agents/refs/aries-round3-concurrency.md` |
-| R4 Resource | behavior under pressure/failure | `.claude/agents/refs/aries-round4-resource.md` |
-| R5 Input | hostile payloads to parsers | `.claude/agents/refs/aries-round5-input.md` |
-| R6 Skills/MCP | agent-shaping infra + bundled scripts | `.claude/agents/refs/aries-round6-skills-mcp.md` |
+| R1 Boundary | edge values of every input | `~/.claude/agents/refs/aries-round1-boundary.md` |
+| R2 State Machine | order of operations | `~/.claude/agents/refs/aries-round2-state-machine.md` |
+| R3 Concurrency | shared state under parallel access | `~/.claude/agents/refs/aries-round3-concurrency.md` |
+| R4 Resource | behavior under pressure/failure | `~/.claude/agents/refs/aries-round4-resource.md` |
+| R5 Input | hostile payloads to parsers | `~/.claude/agents/refs/aries-round5-input.md` |
+| R6 Skills/MCP | agent-shaping infra + bundled scripts | `~/.claude/agents/refs/aries-round6-skills-mcp.md` |
 
 **Step 3 — report.** Severity scale (every finding, every round):
 - **CRITICAL** — data loss / RCE / exfiltration

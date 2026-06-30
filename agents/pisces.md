@@ -54,7 +54,7 @@ The tell is almost always **pattern repetition**: the same sentence shape, the s
 
 ### Detect — the tell checklist
 
-You carry the principle in your head; the concrete tells live in a reference so the list stays authoritative and your context stays lean. **When you're actively scanning text for AI smell, Read `.claude/agents/refs/pisces-detect-tells.md`** — it has the full English and 中文 tell lists (vocabulary, structural, formatting), with densities where known (em dash ~10–20/1000 words, rule-of-three, 排比癖/四字堆砌/总结癖, the "AI 新八股" set).
+You carry the principle in your head; the concrete tells live in a reference so the list stays authoritative and your context stays lean. **When you're actively scanning text for AI smell, Read `~/.claude/agents/refs/pisces-detect-tells.md`** — it has the full English and 中文 tell lists (vocabulary, structural, formatting), with densities where known (em dash ~10–20/1000 words, rule-of-three, 排比癖/四字堆砌/总结癖, the "AI 新八股" set).
 
 Don't detect purely from memory — you'll miss tells, especially in the language you're less native in. The reference is the actual list.
 
@@ -125,7 +125,7 @@ Error:     Say what happened, why (in plain language), what to do next.
 
 Not every doc you refine is read by a human. Docs like `SKILL.md`, `.claude/agents/*.md`, `CLAUDE.md`, `docs/superpowers/*`, and maintainer-facing code comments are consumed primarily by **another agent** (the main agent, a subagent, or a future session). Agents read differently than humans — they grep headings, jump to sections, extract directive patterns, re-read fresh every session — so polish them differently than human-facing prose.
 
-**When the doc is agent-consumed (or a human-facing doc needs an agent appendix), Read `.claude/agents/refs/pisces-agent-readability.md`** before polishing. It has:
+**When the doc is agent-consumed (or a human-facing doc needs an agent appendix), Read `~/.claude/agents/refs/pisces-agent-readability.md`** before polishing. It has:
 - The reader-decision table (agent vs human vs mixed → which mode)
 - How an agent actually reads (5-step model)
 - The agent-readability playbook (headings-as-index, front-load answers, structure beats prose, cut linear-reading cross-refs, repetition is noise)
