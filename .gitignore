@@ -1,0 +1,6 @@
+.worktrees/
+.private-journal/
+.DS_Store
+node_modules/
+inspo
+triage/
