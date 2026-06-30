@@ -134,17 +134,36 @@ Return: Summary of what you found and what you fixed.
 
 The generic dispatch above uses anonymous `Task("...")` calls. In this fork, you have **9 single-purpose subagents** with isolated context, scoped tools, and built-in output formats. Use `subagent_type=` instead of writing prompts from scratch.
 
-### Task type → guardian matrix
+### What actually parallelizes (and what doesn't)
 
-| Task shape | Dispatch | Notes |
-|------------|----------|-------|
-| N independent bugs in different files/subsystems | N × **cancer** | Each gets a reproduction; scope-isolate (see below) |
-| N independent new-feature tasks from a plan | N × **capricorn** | Each gets one task from the plan; scope-isolate |
-| Bug fix + need to research the library's behavior | **cancer** + **sagittarius** (parallel) | sagittarius writes findings-external.md; cancer reads it |
-| New feature + need to map unfamiliar codebase | **capricorn** + **virgo** (parallel) | virgo writes findings-local.md; capricorn reads it |
-| Map local code + research external library | **virgo** + **sagittarius** (parallel) | Classic brainstorming exploration pair; writes findings-local.md + findings-external.md, no conflict |
-| Adversarial testing on N subsystems | N × **aries** | Each gets one subsystem to break |
-| Polish N independent docs | N × **pisces** | Each gets one doc draft |
+Parallel dispatch requires **both**:
+1. **No time-ordering dependency** between the tasks (neither needs the other's output to start)
+2. **No shared mutable state** (they don't edit the same files or write to the same output file)
+
+Apply those two tests honestly. Most "let's parallelize this" combinations fail one of them.
+
+#### Truly parallel — safe to dispatch concurrently
+
+| Pattern | Dispatch | Why it's safe |
+|---------|----------|---------------|
+| N independent bugs in different subsystems | N × **cancer** | Each writes its own diagnosis file + edits its own scope. No shared state, no ordering. |
+| N independent new-feature tasks from a plan | N × **capricorn** | Each implements one plan task. Safe **iff** the tasks touch disjoint files (the plan should already ensure this). |
+| Map local code + research external library | **virgo** + **sagittarius** | Both read-only; write to separate files (`findings-local.md` vs `findings-external.md`). No ordering. |
+| Adversarial testing on N subsystems | N × **aries** | Each breaks its own subsystem; writes its own review file. |
+| Polish N independent docs | N × **pisces** | Each edits its own doc. |
+
+#### Looks parallel but isn't — dispatch sequentially
+
+| Tempting combination | Why it's actually serial | Right order |
+|----------------------|--------------------------|-------------|
+| **capricorn** + **virgo** (build + map unfamiliar code) | capricorn needs virgo's map to know where to put things | virgo first → capricorn reads `findings-local.md` → capricorn |
+| **cancer** + **sagittarius** (fix bug + research library behavior) | cancer's root-cause usually depends on what sagittarius finds | sagittarius first → cancer reads `findings-external.md` → cancer |
+| **capricorn** + **sagittarius** (build feature + research its library) | same — implementation depends on library facts | sagittarius first → capricorn |
+| **cancer** + **virgo** (fix bug + map unfamiliar code) | cancer needs the map to locate root cause | virgo first → cancer |
+
+**The pattern:** "Explorer (virgo / sagittarius) + Actor (capricorn / cancer)" is almost always serial. The actor needs the explorer's findings to do its job. Don't dispatch them together hoping they'll synchronize — they won't, and the actor will guess wrong.
+
+**The exception:** if the explorer's findings are **already on disk** from an earlier session (e.g. virgo mapped the codebase last week, findings-local.md exists), then the actor can read that and you don't need to dispatch the explorer at all in this turn. That's not parallel dispatch — that's reading the archive.
 
 ### Why the guardians beat anonymous Task
 
@@ -179,6 +198,7 @@ The scope constraint is the difference between two clean fixes and a merge confl
 - **Quick fix you can do yourself in 30 seconds** → just do it; dispatching has overhead
 - **Ambiguous task** ("fix the bug" with no repro) → ask the user for a repro first; cancer will BLOCKED otherwise
 - **Task needs design judgment** → brainstorming skill first, not parallel dispatch
+- **Explorer + Actor for the same goal** (e.g. virgo + capricorn to "map then build", sagittarius + cancer to "research then fix") → these are **sequential**, not parallel. The actor needs the explorer's output. Dispatch the explorer first, wait for its findings file, then dispatch the actor. Don't fake parallelism here — the actor will guess wrong without the explorer's conclusions.
 
 ## Real Example from Session
 
