@@ -9,6 +9,8 @@ Dispatch a code reviewer subagent to catch issues before they cascade. The revie
 
 **Core principle:** Review early, review often.
 
+**Why early and often:** a defect found at task N costs roughly N to fix; the same defect found at merge, or after the next task builds on it, costs N+1 plus the rework of everything stacked on top. Reviewing after each task means the reviewer is judging a small, understandable diff against a fresh intent — which is the regime where review actually catches things. Batching review to "after the whole feature" means the reviewer faces a huge diff with cold intent, defects have already been built upon, and the fixes ripple through work that wouldn't exist if the first defect had been caught. Frequent small reviews aren't more total review time — they're less, because they prevent the expensive late-stage rework.
+
 ## When to Request Review
 
 **Mandatory:**
@@ -90,10 +92,10 @@ You: [Fix progress indicators]
 ## Red Flags
 
 **Never:**
-- Skip review because "it's simple"
-- Ignore Critical issues
-- Proceed with unfixed Important issues
-- Argue with valid technical feedback
+- Skip review because "it's simple" — *why: "simple" is your assessment before the review, i.e., at the moment of least information. Simple changes still harbor the defects you can't see in your own work — that's the entire reason review exists. The cost of review scales with diff size, so a "simple" change is also the cheapest possible review to run; skipping it trades a tiny saving for the one class of error (your own blind spot) review uniquely catches.*
+- Ignore Critical issues — *why: Critical means "this will break / has broken / is unsafe to merge." Ignoring it doesn't make it go away; it moves the breakage from "found in review" to "found in production," where the same defect costs dramatically more and lands on users.*
+- Proceed with unfixed Important issues — *why: Important means "should not ship as-is but not catastrophic." Proceeding accumulates these into a backlog of known-but-shipped defects that each become someone else's problem later — and each one makes the next review harder, because the reviewer can't tell new issues from the accepted-old-ones.*
+- Argue with valid technical feedback — *why: if the feedback is valid, arguing delays a fix you're going to make anyway, and burns the review cycle on ego instead of code. The counter-case (pushing back on feedback that's *wrong*) is different and encouraged — but that requires you to have verified it's wrong, not just that you'd prefer it were.*
 
 **If reviewer wrong:**
 - Push back with technical reasoning
