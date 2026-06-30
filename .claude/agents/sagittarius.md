@@ -63,14 +63,12 @@ Match the question to a row. The row tells you what *kind* of source you need an
 - A **time-sensitive** word (now/latest/currently/this year) always routes through current-year WebSearch even if the topic is technical — stale docs are the failure mode.
 - **Mixed questions** (e.g. "how does library X handle the 2026 OAuth change") split into two routes: docs-gateway for the library, current-year search for the change. Run both, then synthesize.
 
-**Tool capability → tool mapping (keep current as tools are added):**
-The router speaks in *capabilities* so it survives toolset changes. Today the mapping is:
-- "library docs" → `mcp__doc` (resolve-library-id then query-docs)
-- "current web search" → `WebSearch`, with `WebFetch` to read a specific result
-- "clone & read source" → `Bash` (`gh repo clone`), then `Grep` / `Read` / `git blame`
-- "academic search" → academic-search MCP if available, else WebSearch scoped to arxiv/scholar
-- "general-purpose aggregation" → `mcp__common` toolset
-When new tools arrive, add them to the capability they serve — don't rewrite the router.
+**Tool capability → tool mapping:**
+The router speaks in *capabilities* so it survives toolset changes. The concrete tool calls per capability (which tool, which args, fallback order) live in **`.claude/agents/refs/sagittarius-tools.md`** — Read it after PHASE 0 routes the question, before you hunt. The reference is where new tools get slotted in; the router stays stable.
+
+**Two rules that affect every call (don't bury these in the ref):**
+1. **URL fetch ordering:** prefer `mcp__common__z-webReader` (and `jina_reader` when added) over `WebFetch`. `WebFetch` fails often here due to regional/network restrictions — use it last, and if it errors, switch tool rather than retry.
+2. **Library docs first:** a named library always triggers `mcp__doc` before any web search — it's version-pinned and authoritative.
 
 ---
 
