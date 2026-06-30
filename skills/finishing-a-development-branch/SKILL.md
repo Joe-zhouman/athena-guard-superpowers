@@ -35,6 +35,8 @@ Cannot proceed with merge/PR until tests pass.
 
 Stop. Don't proceed to Step 2.
 
+**Why tests gate the menu, not just the merge:** once you present options, the user is choosing an *integration path* (merge / PR / discard) — and every path except discard commits the work somewhere visible. Offering that menu on failing tests invites the user to pick "create PR" against code that doesn't pass, which turns a local-known-failure into a public one the team now has to handle. The gate exists because the menu itself is a commitment point: by the time options are on screen, the failing tests are about to become someone else's problem. Verifying first means the menu is only offered on work that's actually ready to leave this workspace.
+
 **If tests pass:** Continue to Step 2.
 
 ### Step 2: Detect Environment
@@ -157,6 +159,8 @@ Type 'discard' to confirm.
 
 Wait for exact confirmation.
 
+**Why typed confirmation, not yes/no:** "discard" is irreversible — branch force-deleted, commits gone, worktree removed. A y/n prompt is too easy to approve on autopilot, especially at the end of a long session when attention is low. Requiring the user to type the exact word introduces deliberate friction: it can't be clicked through without engaging the decision. The friction is the feature — it exists so that "discard" only happens when the user actually means it, not when they're confirming a habit.
+
 If confirmed:
 ```bash
 MAIN_ROOT=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
@@ -190,6 +194,8 @@ git worktree prune  # Self-healing: clean up any stale registrations
 ```
 
 **Otherwise:** The host environment (harness) owns this workspace. Do NOT remove it. If your platform provides a workspace-exit tool, use it. Otherwise, leave the workspace in place.
+
+**Why provenance gates cleanup:** a worktree the harness created is tracked by the harness — its session bookkeeping, status, and exit-time logic all reference it. If you `git worktree remove` it out from under the harness, the harness now holds references to a directory that's gone: phantom state, broken status, and at session end it may try to operate on a workspace that doesn't exist. "I didn't create it, so I don't clean it up" isn't politeness — it's that removing someone else's tracked state desynchronizes their model from reality. Only clean up what you created (`.worktrees/`, `worktrees/`, the global path); for everything else, defer to the owner.
 
 ## Quick Reference
 
