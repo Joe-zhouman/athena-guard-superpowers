@@ -68,7 +68,7 @@ The router speaks in *capabilities* so it survives toolset changes. The concrete
 
 **Two rules that affect every call (don't bury these in the ref):**
 1. **URL fetch ordering:** prefer `mcp__common__z-webReader` (and `jina_reader` when added) over `WebFetch`. `WebFetch` fails often here due to regional/network restrictions — use it last, and if it errors, switch tool rather than retry.
-2. **Library docs first:** a named library always triggers `mcp__doc` before any web search — it's version-pinned and authoritative.
+2. **Library docs first:** a named library always triggers `mcp__doc` (context7) before any web search — it's version-pinned and authoritative.
 
 ---
 
@@ -78,22 +78,20 @@ Execute the route PHASE 0 picked. The per-strategy details below are the deep-di
 
 ### Library-docs route (named library + usage)
 
-```
-mcp__doc  →  resolve the library, then fetch its docs
-```
-Returns authoritative, version-pinned docs — more precise and citable than WebSearch. Read the actual section that answers the question; cite it. Fall back to WebSearch only if the gateway has nothing on the library.
+`mcp__doc` (context7). It's version-pinned and citable — read the section that answers the question and cite it. Fall back to web search only if the gateway has nothing on the library. (Call details in the tools ref.)
 
 ### Source-code route (implementation questions)
 
 ```
 Step 1: Locate
         WebSearch("site:github.com [topic]") to find the repo, OR
-        gh repo clone owner/repo ${TMPDIR:-/tmp}/name -- --depth 1
+        git clone --depth 1 https://github.com/owner/repo.git ${TMPDIR:-/tmp}/name
+        (gh is NOT available here — use git clone only)
 Step 2: Go deep
         Grep for patterns, Read key files, git blame for history
 Step 3: Cite
         Construct a permalink: https://github.com/<owner>/<repo>/blob/<sha>/<filepath>#L<start>-L<end>
-        Get SHA: `git rev-parse HEAD` or `gh api repos/owner/repo/commits/HEAD --jq '.sha'`
+        Get SHA: `git rev-parse HEAD`
 ```
 
 ### Academic route

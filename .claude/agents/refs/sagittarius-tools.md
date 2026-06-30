@@ -10,13 +10,13 @@ The concrete "which tool, which args" for each research shape. sagittarius's bod
 
 | Capability | Primary tool(s) | Notes |
 |------------|-----------------|-------|
-| Library docs (version-pinned, authoritative) | `mcp__doc` | Try FIRST for any named library. Most precise + citable. |
+| Library docs (version-pinned, authoritative) | `mcp__doc` (= context7) | Try FIRST for any named library. Most precise + citable. |
 | Current web search | `mcp__common__vps-searxng_search` (preferred), `WebSearch` (fallback) | searxng is a meta-search, often broader. |
 | Read a specific URL into context | `mcp__common__z-webReader` (preferred), `jina_reader` (when added), `WebFetch` (last resort) | **See "URL fetch ordering" below — fetch tools fail often due to regional restrictions.** |
 | Read a file inside a GitHub repo | `mcp__common__z-read_file` | No clone needed; good for one file. |
 | Map a GitHub repo's structure | `mcp__common__z-get_repo_structure` | Before deciding which files to read. |
 | Search a repo's docs/issues/commits | `mcp__common__z-search_doc` | Faster than clone for "does repo X mention Y". |
-| Go deep on source (full repo, grep, blame) | `Bash` (`gh repo clone --depth 1`) then `Grep`/`Read`/`git blame` | When you need to trace implementation across files. |
+| Go deep on source (full repo, grep, blame) | `Bash` (`git clone --depth 1`) then `Grep`/`Read`/`git blame` | When you need to trace implementation across files. `gh` is NOT available here (network restriction) — use `git clone` only. |
 | Academic search | academic-search MCP if available, else `mcp__common__vps-searxng_search` scoped to arxiv/scholar | Check venue/date/citations. |
 
 **Pending tools (not yet wired — add here when installed):** `jina_reader` (URL read, preferred tier), `zotero` (academic refs), `ima` (knowledge base), 知乎 search. When added, slot into the row above by capability.
@@ -37,21 +37,9 @@ If a fetch tool returns an error, empty body, or clearly truncated content, **sw
 
 ## Per-capability call patterns
 
-### Library docs — `mcp__doc` (try FIRST for any named library)
+### Library docs — `mcp__doc` (= context7)
 
-Two-step (the gateway needs a library ID before it can serve docs):
-
-```
-1. mcp__doc__context7-resolve-library-id
-   libraryName: "<library>", query: "<what you need to know>"
-   → returns a libraryId like "/facebook/react"
-
-2. mcp__doc__context7-query-docs
-   libraryId: "<from step 1>", query: "<specific question>"
-   → returns version-pinned doc excerpts
-```
-
-Cite the library + version. Fall back to searxng only if the gateway has nothing on the library.
+You already know context7's two-step flow (resolve-library-id → query-docs). `mcp__doc` is that gateway. Try it FIRST for any named library — version-pinned and citable. Fall back to searxng only if it has nothing on the library.
 
 ### Current web search — `mcp__common__vps-searxng_search`
 
@@ -103,16 +91,16 @@ Faster than cloning when the question is "does this repo address X" or "what cha
 ### Go deep on source — `Bash` clone
 
 ```
-gh repo clone owner/repo "${TMPDIR:-/tmp}/name" -- --depth 1
+git clone --depth 1 https://github.com/owner/repo.git "${TMPDIR:-/tmp}/name"
 cd "${TMPDIR:-/tmp}/name"
 # then Grep for patterns, Read key files, git blame for history
 ```
 
-Use when you need to trace an implementation across files, or git blame for "when/why did this change." Always cite a permalink:
+Use when you need to trace an implementation across files, or git blame for "when/why did this change." (`gh` is not available here — network restriction — so always `git clone`, never `gh repo clone`.) Always cite a permalink:
 ```
 https://github.com/<owner>/<repo>/blob/<sha>/<filepath>#L<start>-L<end>
 ```
-Get SHA: `git rev-parse HEAD` or `gh api repos/owner/repo/commits/HEAD --jq '.sha'`
+Get SHA: `git rev-parse HEAD`
 
 ### Academic — search + verify
 
