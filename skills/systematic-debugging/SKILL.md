@@ -21,6 +21,8 @@ NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 
 If you haven't completed Phase 1, you cannot propose fixes.
 
+**Why:** A symptom is what the bug *does*; the root cause is what the bug *is*. Patching the symptom is betting the bug has no other effects — but by definition you haven't checked, because checking *is* root-cause investigation. Symptom patches "work" in the sense that the one observed failure goes away, while silently leaving the actual fault in place to surface again elsewhere, often as a worse bug you no longer connect to this one. The fix that feels slow (investigate first) is the only one that doesn't guarantee rework.
+
 ## When to Use
 
 Use for ANY technical issue:
@@ -62,6 +64,8 @@ You MUST complete each phase before proceeding to the next.
    - What are the exact steps?
    - Does it happen every time?
    - If not reproducible → gather more data, don't guess
+
+   **Why "don't guess when not reproducible":** a fix you can't verify is a fix you can't know worked. If the bug is intermittent, the "fix" will appear to work simply because the bug didn't happen to recur — and you'll move on while the real cause is still there. The discipline is: no reproduction, no fix. Keep gathering evidence (logs, frequency, triggers) until you can make it happen on demand. A reproducible bug is a solved bug; an irreproducible "fix" is a hope.
 
 3. **Check Recent Changes**
    - What changed that could cause this?
@@ -156,6 +160,8 @@ You MUST complete each phase before proceeding to the next.
    - One variable at a time
    - Don't fix multiple things at once
 
+   **Why "one variable at a time":** if you change three things and the bug disappears, you don't know which change fixed it — and worse, one of the other two changes may have introduced a *new* bug that's currently masked by the fix working. You're left with a working system and no model of why, which means the next similar bug you can't reason about. One change → observe → reason. That's the only way each step adds to your understanding instead of muddying it.
+
 3. **Verify Before Continuing**
    - Did it work? Yes → Phase 4
    - Didn't work? Form NEW hypothesis
@@ -184,6 +190,8 @@ You MUST complete each phase before proceeding to the next.
    - No "while I'm here" improvements
    - No bundled refactoring
 
+   **Why no "while I'm here":** a debugging commit must say "this changed because the bug was X." Bundling a refactor or improvement into the same change ties an unreviewed modification to a fix that *had* to ship. If the bundled change later causes a regression, you can't revert the fix without losing the refactor — and you can't reason about which change caused the new bug because they landed together. Debugging commits are surgical on purpose: one fault in, one fix out, nothing else moves.
+
 3. **Verify Fix**
    - Test passes now?
    - No other tests broken?
@@ -197,6 +205,8 @@ You MUST complete each phase before proceeding to the next.
    - DON'T attempt Fix #4 without architectural discussion
 
 5. **If 3+ Fixes Failed: Question Architecture**
+
+   **Why this is the rule, not "try harder":** each failed fix is evidence — not about the bug, but about the *shape* of the problem. When three different fixes each reveal a *new* problem in a *different* place, the common cause is no longer inside any one component: it's the architecture that connects them. A fourth fix at that point isn't perseverance, it's the sunk-cost fallacy — you're patching a structure whose assumptions are wrong, and every patch just moves the stress to the next weak joint. The disciplined move is counter-intuitive: stop fixing, start doubting the design. That's not giving up — it's recognizing that the bug is telling you the architecture is the bug.
 
    **Pattern indicating architectural problem:**
    - Each fix reveals new shared state/coupling/problem in different place
@@ -244,16 +254,16 @@ If you catch yourself thinking:
 
 ## Common Rationalizations
 
-| Excuse | Reality |
-|--------|---------|
-| "Issue is simple, don't need process" | Simple issues have root causes too. Process is fast for simple bugs. |
-| "Emergency, no time for process" | Systematic debugging is FASTER than guess-and-check thrashing. |
-| "Just try this first, then investigate" | First fix sets the pattern. Do it right from the start. |
-| "I'll write test after confirming fix works" | Untested fixes don't stick. Test first proves it. |
-| "Multiple fixes at once saves time" | Can't isolate what worked. Causes new bugs. |
-| "Reference too long, I'll adapt the pattern" | Partial understanding guarantees bugs. Read it completely. |
-| "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
-| "One more fix attempt" (after 2+ failures) | 3+ failures = architectural problem. Question pattern, don't fix again. |
+| Excuse | Reality | Why |
+|--------|---------|-----|
+| "Issue is simple, don't need process" | Simple issues have root causes too. Process is fast for simple bugs. | "Simple" is your estimate before investigating — exactly the moment you have the least information. Simple bugs *that you understand* may not need much process, but you only know you understand it *after* the process confirms the cause. Skipping the process on a "simple" bug means betting your pre-investigation guess was right, when the process to check is minutes. |
+| "Emergency, no time for process" | Systematic debugging is FASTER than guess-and-check thrashing. | Guess-and-check feels fast because each guess is quick — but the failure mode is you try 5 guesses, each "almost works," and burn an hour. Systematic is slower per step but converges, because each step narrows the cause instead of adding new variables. Under time pressure, the slow-converging path is the only one that actually ends. |
+| "Just try this first, then investigate" | First fix sets the pattern. Do it right from the start. | The first fix you attempt becomes your working theory of the bug — if it's a guess, you've now anchored on a guess, and your subsequent investigation will be biased toward confirming it. Doing the investigation first means your first fix is informed, not anchoring. |
+| "I'll write test after confirming fix works" | Untested fixes don't stick. Test first proves it. | If you fix first and it "works," you have no test proving the bug existed or that the fix addresses it — so when a later change reintroduces the bug, nothing catches it and you have no record of what the fix was for. The failing test *is* the proof the bug existed and the fix is real; writing it after is how regressions silently return. |
+| "Multiple fixes at once saves time" | Can't isolate what worked. Causes new bugs. | Parallel changes can't be attributed: if the bug goes away, you don't know which change did it, and the other changes are now unreviewed modifications riding along. If a new bug appears next week, you can't tell which of the bundled changes caused it. "Saves time now" costs you the ability to reason about your own system later. |
+| "Reference too long, I'll adapt the pattern" | Partial understanding guarantees bugs. Read it completely. | A pattern's correctness usually lives in the parts that *look* optional — the edge-case handling, the ordering, the error paths you skimmed past. Adapting from a partial read means copying the shape without the load-bearing details, and the bugs it introduces are exactly in the parts you didn't read. |
+| "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. | "I see it" is a description of the symptom (what breaks), not the cause (why it breaks). Fixing at the symptom level is the Iron Law violation — the cause is still there. You haven't seen the problem until you can explain the mechanism that produces the symptom, not just point at the symptom. |
+| "One more fix attempt" (after 2+ failures) | 3+ failures = architectural problem. Question pattern, don't fix again. | Each failed fix is data about the problem's shape, not just about the bug. Three fixes failing in different places is strong evidence the fault is structural, not local — and a fourth local fix will fail for the same structural reason. The impulse to "try once more" is sunk cost, not insight; the architecture is telling you it's the architecture. |
 
 ## Quick Reference
 
