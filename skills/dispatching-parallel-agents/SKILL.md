@@ -130,32 +130,99 @@ Return: Summary of what you found and what you fixed.
 **Exploratory debugging:** You don't know what's broken yet
 **Shared state:** Agents would interfere (editing same files, using same resources)
 
+## Dispatching Athena Guardians
+
+The generic dispatch above uses anonymous `Task("...")` calls. In this fork, you have **9 single-purpose subagents** with isolated context, scoped tools, and built-in output formats. Use `subagent_type=` instead of writing prompts from scratch.
+
+### Task type → guardian matrix
+
+| Task shape | Dispatch | Notes |
+|------------|----------|-------|
+| N independent bugs in different files/subsystems | N × **cancer** | Each gets a reproduction; scope-isolate (see below) |
+| N independent new-feature tasks from a plan | N × **capricorn** | Each gets one task from the plan; scope-isolate |
+| Bug fix + need to research the library's behavior | **cancer** + **sagittarius** (parallel) | sagittarius writes findings-external.md; cancer reads it |
+| New feature + need to map unfamiliar codebase | **capricorn** + **virgo** (parallel) | virgo writes findings-local.md; capricorn reads it |
+| Map local code + research external library | **virgo** + **sagittarius** (parallel) | Classic brainstorming exploration pair; writes findings-local.md + findings-external.md, no conflict |
+| Adversarial testing on N subsystems | N × **aries** | Each gets one subsystem to break |
+| Polish N independent docs | N × **pisces** | Each gets one doc draft |
+
+### Why the guardians beat anonymous Task
+
+1. **No prompt engineering.** Each guardian already knows its role, tools, output format. You write the *task-specific* brief (what bug, what file, what scope), not the role definition.
+2. **Tool permissions are scoped.** cancer has Edit but no Agent. virgo has Read/Grep/Glob but no Write. You can't accidentally give a reviewer the power to edit code.
+3. **Output is structured.** cancer writes `diagnoses/<task>.md`; scorpio writes `reviews/<task>-spec.md`. The next session can restore context by reading these files — no chat transcripts to replay.
+4. **Context is isolated.** Dispatching capricorn doesn't pollute your main context with implementation detail. Dispatching scorpio doesn't pollute it with review chatter. You stay focused on coordination.
+
+### Scope isolation for parallel implementers
+
+When dispatching multiple **capricorn** or multiple **cancer** in parallel, they will edit the same codebase. Prevent conflicts by scope-isolating in the brief:
+
+```
+Agent(subagent_type="cancer",
+      description="Fix bug A in checkout flow",
+      prompt="Bug: checkout hangs when cart has digital + physical items. Repro: [steps].
+              Scope: ONLY touch src/checkout/. Do NOT touch src/billing/, src/inventory/.
+              Write diagnosis to docs/superpowers/diagnoses/checkout-hang-diagnosis.md.")
+
+Agent(subagent_type="cancer",
+      description="Fix bug B in billing",
+      prompt="Bug: invoice tax not calculated for EU customers. Repro: [steps].
+              Scope: ONLY touch src/billing/. Do NOT touch src/checkout/, src/inventory/.
+              Write diagnosis to docs/superpowers/diagnoses/eu-tax-diagnosis.md.")
+```
+
+The scope constraint is the difference between two clean fixes and a merge conflict.
+
+### When NOT to use a guardian
+
+- **Single-shot lookup** ("where is X defined?") → built-in Explore agent, not virgo
+- **Quick fix you can do yourself in 30 seconds** → just do it; dispatching has overhead
+- **Ambiguous task** ("fix the bug" with no repro) → ask the user for a repro first; cancer will BLOCKED otherwise
+- **Task needs design judgment** → brainstorming skill first, not parallel dispatch
+
 ## Real Example from Session
 
-**Scenario:** 6 test failures across 3 files after major refactoring
+**Scenario:** 3 independent bugs reported after a major refactor. Each is in a different subsystem, with a clear reproduction.
 
-**Failures:**
-- agent-tool-abort.test.ts: 3 failures (timing issues)
-- batch-completion-behavior.test.ts: 2 failures (tools not executing)
-- tool-approval-race-conditions.test.ts: 1 failure (execution count = 0)
+**Bugs:**
+- `src/checkout/`: cart total wrong when mixing tax-exempt and taxable items
+- `src/billing/`: invoice PDF missing line items for $0 entries
+- `src/inventory/`: stock count goes negative after concurrent returns
 
-**Decision:** Independent domains - abort logic separate from batch completion separate from race conditions
+**Decision:** Three independent subsystems, three repros. No shared state. Dispatch **three cancer agents in parallel**, scope-isolated.
 
-**Dispatch:**
+**Dispatch (single message, three Agent calls so they run concurrently):**
 ```
-Agent 1 → Fix agent-tool-abort.test.ts
-Agent 2 → Fix batch-completion-behavior.test.ts
-Agent 3 → Fix tool-approval-race-conditions.test.ts
+Agent(subagent_type="cancer",
+      description="Fix cart-total bug in checkout",
+      prompt="Bug: cart total is wrong when cart has both tax-exempt and taxable items.
+              Repro: add 1 book ($10, taxable) + 1 gift card ($25, tax-exempt) → total shows $38.50 instead of $35.
+              Scope: ONLY src/checkout/. Do NOT touch src/billing/ or src/inventory/.
+              Diagnosis: docs/superpowers/diagnoses/cart-total-mixed-tax-diagnosis.md.")
+
+Agent(subagent_type="cancer",
+      description="Fix missing $0 line items in invoice PDF",
+      prompt="Bug: invoice PDF omits line items priced at $0 (e.g. free promo items).
+              Repro: order with 1 paid item ($15) + 1 free promo → PDF shows only the $15 line.
+              Scope: ONLY src/billing/. Do NOT touch src/checkout/ or src/inventory/.
+              Diagnosis: docs/superpowers/diagnoses/invoice-zero-line-items-diagnosis.md.")
+
+Agent(subagent_type="cancer",
+      description="Fix negative stock on concurrent returns",
+      prompt="Bug: stock count for an item goes negative when two returns hit concurrently.
+              Repro: stock=1; two concurrent returns of the same SKU → final stock=-1.
+              Scope: ONLY src/inventory/. Do NOT touch src/checkout/ or src/billing/.
+              Diagnosis: docs/superpowers/diagnoses/negative-stock-concurrent-returns-diagnosis.md.")
 ```
 
-**Results:**
-- Agent 1: Replaced timeouts with event-based waiting
-- Agent 2: Fixed event structure bug (threadId in wrong place)
-- Agent 3: Added wait for async tool execution to complete
+**Results (each cancer returns its own diagnosis + fix + regression test):**
+- Cancer 1: Root cause — tax applied to whole cart instead of per-line. Fix: per-line tax in `src/checkout/total.ts`. Regression test added.
+- Cancer 2: Root cause — PDF renderer skipped rows where `price === 0` (filter intended for null prices). Fix: distinguish `0` from `null` in `src/billing/pdf.ts`. Regression test added.
+- Cancer 3: Root cause — `decrement` non-atomic; concurrent reads both saw stock=1 before either wrote. Fix: atomic compare-and-set in `src/inventory/stock.ts`. Regression test added.
 
-**Integration:** All fixes independent, no conflicts, full suite green
+**Integration:** All three fixes landed in separate files. No conflicts. Full suite green. Three diagnosis files written to `docs/superpowers/diagnoses/` — next session can read them if a related bug appears.
 
-**Time saved:** 3 problems solved in parallel vs sequentially
+**Time saved:** 3 bugs diagnosed + fixed + regression-tested in the time of 1.
 
 ## Key Benefits
 

@@ -1,22 +1,28 @@
 # Athena Guardians — 调用指南
 
-8 个 subagent 的使用场景与反模式。前 4 个已接入 superpowers 流程(自动调用);后 4 个由主 agent 按需派发。
+9 个 subagent 的使用场景与反模式。前 5 个已接入 superpowers 流程(自动调用);后 4 个由主 agent 按需派发。
 
-## 核心四员(superpowers 自动调用)
+## 核心五员(superpowers 自动调用)
 
 ### capricorn — implementer
 - 实现单个定义明确的任务(来自 plan)
-- 有清晰复现步骤的 bug 修复
-- **不派**:架构决策、模糊需求、需要研究的任务(他会报 BLOCKED)
+- 用 vertical-slice TDD:一个 red → 一个 green,测行为不测实现
+- **不派**:架构决策、模糊需求、需要研究的任务(他会报 BLOCKED)、修别人代码里的 bug(归 cancer)
+
+### cancer — bug-fixer
+- 修**别人代码**里的 bug(给定复现/报错,不是 plan)
+- TDD 纪律:failing test 复现 → 最小修复 → 转 passing;regression test 永久留着
+- diagnosis 强制写 `docs/superpowers/diagnoses/<task>-diagnosis.md`
+- **不派**:写新功能(归 capricorn)、自己刚写的代码的 bug(归 capricorn 收尾)、只读探索(归 virgo)
 
 ### scorpio — spec-reviewer
 - capricorn 声称"done"后,验证实现是否真的符合规格
 - **不信 implementer 的报告**,独立读码
 - 查 missing / extra / misunderstanding
-- **不派**:代码质量(归 taurus)、运行时 bug(归 aries)
+- **不派**:代码质量(归 taurus)、bug 修复(归 cancer)、对抗性破坏测试(归 aries)
 
 ### taurus — code-quality-reviewer
-- scorpio 通过后,审查代码质量
+- scorpio 通过后,审查代码质量;**cancer 修完 bug 也派 taurus 审质量**(bug 没有 spec,跳过 scorpio,test 就是 spec)
 - 可读性、命名、重复、错误处理、文件职责单一、测试真实性
 - 每条 issue 必须带 file:line
 - **不派**:规格符合性(归 scorpio)、需运行才能确认的 bug(归 aries)
@@ -58,6 +64,9 @@
 
 - **简单任务不用 capricorn**——明确的小修直接做
 - **capricorn 不自己委派审查**——他没 Agent 工具;审查由 superpowers 流程独立派 scorpio/taurus
+- **新功能不派 cancer**——cancer 是 bug-fixer,起点是复现/报错,不是 plan
+- **bug 不派 capricorn**(除非是他自己刚写的代码)——修别人代码归 cancer,因为他先读懂再改,capricorn 跳过读
+- **没有复现不派 cancer**——cancer 的纪律是 RED→GREEN,无法复现就 BLOCKED,不要瞎改
 - **没有草稿不用 pisces**
 - **单次快查不用 virgo**(用内置 Explore)
 - **happy path 验证不找 aries**
@@ -71,6 +80,7 @@
 | virgo | 本地探索地图 | `findings-local.md`(追加) |
 | sagittarius | 外部研究结论 | `findings-external.md`(追加) |
 | capricorn | 提交后状态 | `progress.md`(追加一行) |
+| cancer | bug 诊断 + regression test | `diagnoses/<task>-diagnosis.md` + 新增的 test 文件 |
 | scorpio | 规格审查 | `reviews/<task>-spec.md` |
 | taurus | 质量审查 | `reviews/<task>-quality.md` |
 | aries | 对抗测试 | `reviews/<task>-adversarial.md` |

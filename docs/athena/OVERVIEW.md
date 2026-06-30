@@ -1,21 +1,22 @@
 # Athena Guardians — Overview
 
-8 个单一职责 subagent,内置于本插件,替换 superpowers 默认的 `general-purpose` 调用。性格驱动,职责从性格长出来。探索/审查/研究的发现**持久化到磁盘**,让大项目能跨 session 重建 context。
+9 个单一职责 subagent,内置于本插件,替换 superpowers 默认的 `general-purpose` 调用。性格驱动,职责从性格长出来。探索/审查/研究的发现**持久化到磁盘**,让大项目能跨 session 重建 context。
 
 ## 设计原则
 
 1. **单一职责**——每个 agent 只做一件事。性格定,职责从性格长出来。
-2. **独立 context**——subagent 的核心价值是隔离上下文。**自己审自己写的东西总是不太好**,所以实现者(capricorn)和审查者(scorpio/taurus/libra)必须是不同 agent、不同 context。
+2. **独立 context**——subagent 的核心价值是隔离上下文。**自己审自己写的东西总是不太好**,所以实现者(capricorn/cancer)和审查者(scorpio/taurus/libra)必须是不同 agent、不同 context。
 3. **持久化**——有"发现"的 agent 把结论写到 `docs/superpowers/`,主 agent 读盘重建 context。
-4. **面向 superpowers 优化**——前 4 个直接对齐 superpowers 流程节点,已在本插件的 SKILL.md 里接好。
+4. **面向 superpowers 优化**——前 5 个直接对齐 superpowers 流程节点,已在本插件的 SKILL.md 里接好。
 
-## The Eight (8/8)
+## The Nine (9/9)
 
-### 核心四员 — 已接入 superpowers 流程
+### 核心五员 — 已接入 superpowers 流程
 
 | Guardian | 性格 | 职责 | 接入点 |
 |----------|------|------|--------|
-| [capricorn](../../.claude/agents/capricorn.md) | 纪律执行者 | 实现 single task、TDD、自审、commit | `subagent-driven-development` 的 implementer |
+| [capricorn](../../.claude/agents/capricorn.md) | 纪律执行者 | 实现 single task、vertical-slice TDD、自审、commit | `subagent-driven-development` 的 implementer |
+| [cancer](../../.claude/agents/cancer.md) | 螃钳精准的诊断者 | 修**别人代码**里的 bug:先读、写 failing test 复现、最小修复、regression test 永久 | bug 修复任务(起点是复现/报错,不是 plan) |
 | [scorpio](../../.claude/agents/scorpio.md) | 不信任的审查者 | 审规格符合性、不信报告、独立读码验证 | `subagent-driven-development` 的 spec-reviewer |
 | [taurus](../../.claude/agents/taurus.md) | 不妥协的标准者 | 审代码质量、按行号说话 | `subagent-driven-development` 的 code-quality-reviewer + `requesting-code-review` |
 | [libra](../../.claude/agents/libra.md) | 公正的裁决者 | 审 plan/spec 是否可执行、approve by default | `brainstorming` + `writing-plans` 的 reviewer(替换原 Self-Review) |
@@ -37,7 +38,8 @@ docs/superpowers/
 ├── plans/            ← writing-plans 产出
 ├── findings-local.md    ← virgo(本地探索)追加
 ├── findings-external.md ← sagittarius(外部研究)追加
-├── progress.md       ← capricorn 每次提交后追加一行
+├── progress.md       ← capricorn/cancer 每次提交后追加一行
+├── diagnoses/        ← cancer 写 bug 诊断(root cause + evidence)
 └── reviews/
     ├── <task>-spec.md          ← scorpio
     ├── <task>-quality.md       ← taurus
@@ -74,12 +76,24 @@ scorpio 审规格符合性  →  taurus 审代码质量
 aries 对抗测试(可选)→ pisces 润色文档(可选)
 ```
 
-scorpio / taurus / libra 都是**独立 context 审查别人写的**——这是本套体系的核心价值。
+**bug 修复走平行流程**(不进 brainstorming/writing-plans):
+
+```
+用户报告 bug(给复现/报错)
+    ↓
+cancer 读码 → 写 failing test 复现(RED)→ 写 diagnosis.md → 最小修复 → 验证(GREEN)
+    ↓
+taurus 审质量(跳过 scorpio,因为 bug 没有 spec,test 就是 spec)
+    ↓
+aries 对抗测试(可选)
+```
+
+scorpio / taurus / libra 都是**独立 context 审查别人写的**——这是本套体系的核心价值。cancer 也是:他修的不是自己写的代码,所以**先读懂**再改。
 
 ## model 分层
 
 - **fable**(高认知):scorpio + capricorn
-- **sonnet**(常规):taurus / libra / aries / pisces
+- **sonnet**(常规):cancer / taurus / libra / aries / pisces
 - **haiku**(搜索/研究):virgo / sagittarius
 
 不可用的 model 静默回退到 inherit。
