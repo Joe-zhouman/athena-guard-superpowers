@@ -21,6 +21,8 @@ Load plan, review critically, execute all tasks, report when complete.
 3. If concerns: Raise them with your human partner before starting
 4. If no concerns: Create TodoWrite and proceed
 
+**Why review a plan you're about to execute, not just follow it:** a plan is a prediction made under incomplete information — written before the code existed, before the real file shapes were visible, before any of it ran. By execution time you have ground truth the planner didn't: the actual code, the actual errors, the actual friction. A step that looked reasonable in planning may turn out to assume something false, depend on something missing, or solve the wrong sub-problem now that you can see the real one. Critically reviewing first means you catch the plan's stale assumptions at the cheapest moment — before you've built on them. Blindly following a plan that's wrong is just a more disciplined way of doing the wrong thing. The plan is a guide, not a contract with the universe.
+
 ### Step 2: Execute Tasks
 
 For each task:
@@ -45,6 +47,8 @@ After all tasks complete and verified:
 - Verification fails repeatedly
 
 **Ask for clarification rather than guessing.**
+
+**Why stop beats guess:** a guess at a blocker doesn't resolve the blocker — it produces work that *looks* like progress and silently entrenches the wrong assumption. You'll implement around the guess, the next task builds on that, and by the time the guess is revealed wrong, unwinding it touches everything downstream. Stopping costs one human round-trip; guessing costs a re-do of however much you built on the guess before it surfaced. The instinct to "not bother the human" is backwards — the human would far rather answer a 30-second question now than debug a guessed-into-existence architecture later. Stopping is the faster path; it just doesn't feel like it in the moment.
 
 ## When to Revisit Earlier Steps
 
