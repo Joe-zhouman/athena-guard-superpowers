@@ -15,6 +15,10 @@ IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
 This is not negotiable. This is not optional. You cannot rationalize your way out of this.
 </EXTREMELY-IMPORTANT>
 
+**Why this exists:** Skills are not ceremony. A skill exists because someone, in this domain, watched real work go wrong in a specific repeatable way — and wrote down the sequence of steps that prevents it. When you skip checking for a skill, you are betting you can reconstruct that hard-won sequence on the fly from first principles. You usually can't: the steps that matter are exactly the ones whose importance isn't obvious, which is why they had to be written down in the first place. So when a skill might apply, invoke it. The cost is one tool call and a few seconds. The cost of not invoking is doing the wrong thing confidently, and not finding out until later when it's expensive to fix. Knowing *why* the rule exists lets you handle the edges — if a situation genuinely shares none of the failure modes the skill guards against, you'll recognize that; if it shares even one, invoke.
+
+## Instruction Priority
+
 ## Instruction Priority
 
 Superpowers skills override default system prompt behavior, but **user instructions always take precedence**:
@@ -69,21 +73,21 @@ digraph skill_flow {
 
 These thoughts mean STOP—you're rationalizing:
 
-| Thought | Reality |
-|---------|---------|
-| "This is just a simple question" | Questions are tasks. Check for skills. |
-| "I need more context first" | Skill check comes BEFORE clarifying questions. |
-| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first. |
-| "I can check git/files quickly" | Files lack conversation context. Check for skills. |
-| "Let me gather information first" | Skills tell you HOW to gather information. External research → sagittarius. Local mapping → virgo. |
-| "I'll just WebSearch this quickly" | External research is sagittarius's job. Dispatch it; don't hunt yourself. |
-| "This doesn't need a formal skill" | If a skill exists, use it. |
-| "I remember this skill" | Skills evolve. Read current version. |
-| "This doesn't count as a task" | Action = task. Check for skills. |
-| "The skill is overkill" | Simple things become complex. Use it. |
-| "I'll just do this one thing first" | Check BEFORE doing anything. |
-| "This feels productive" | Undisciplined action wastes time. Skills prevent this. |
-| "I know what that means" | Knowing the concept ≠ using the skill. Invoke it. |
+| Thought | Reality | Why |
+|---------|---------|-----|
+| "This is just a simple question" | Questions are tasks. Check for skills. | A skill's value is not in "complexity" — it's in the failure modes it freezes in. A question that looks simple can hide a boundary condition you forgot about. Checking costs one call; the skill was written because someone got this wrong before. |
+| "I need more context first" | Skill check comes BEFORE clarifying questions. | The skill may already specify what context to gather and how to ask. Asking the user ad-hoc, then discovering the skill, means you'll re-ask using the skill's better questions — wasting the user's turn. |
+| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first. | Your default exploration method is muscle memory, not the best method. systematic-debugging, virgo, and git-worktrees exist precisely because ad-hoc exploring misses things. Explore *after* you know which method applies. |
+| "I can check git/files quickly" | Files lack conversation context. Check for skills. | A file's content doesn't tell you why the user wants it or what they'll do with the answer. Without that frame you'll report the wrong detail. A skill supplies the frame; checking files first produces a confident-but-misaligned answer. |
+| "Let me gather information first" | Skills tell you HOW to gather information. External research → sagittarius. Local mapping → virgo. | Default information-gathering is ephemeral: you read it, use it, it's gone — no citation, no persistence. sagittarius/virgo write findings to disk so the next session inherits them. Gathering yourself loses that compounding. |
+| "I'll just WebSearch this quickly" | External research is sagittarius's job. Dispatch it; don't hunt yourself. | Your WebSearch is single-shot, uncited, and dies in chat. sagittarius has dedicated library-docs access, cross-references sources, and appends to findings-external.md. Doing it yourself is strictly worse work that also doesn't persist. |
+| "This doesn't need a formal skill" | If a skill exists, use it. | "Formal" is a threshold you invented to justify skipping. Skills don't have to be heavy to help — a 5-line skill still encodes a step you'd otherwise omit. The right question is "does a skill exist," not "is this formal enough." |
+| "I remember this skill" | Skills evolve. Read current version. | You're remembering a past version. Skills get updated precisely when someone found the old version was wrong. Invoking from memory means re-introducing the bug the update fixed. Reading costs one call; trusting memory re-ships known errors. |
+| "This doesn't count as a task" | Action = task. Check for skills. | "Task" isn't yours to define — any output the user acts on can trigger a relevant skill. Declaring "not a task" is a self-issued exemption from the check, and the skill (if one applies) would have improved the output. |
+| "The skill is overkill" | Simple things become complex. Use it. | "Overkill" assumes you already know where the failure modes are. But skills exist because the cost of the failure was high enough to write them down — i.e., because people consistently underestimated it. Your "overkill" judgment is exactly the underestimation the skill guards against. |
+| "I'll just do this one thing first" | Check BEFORE doing anything. | "One quick thing first" is usually procrastination on the check — it feels productive because you're moving, but if you're moving the wrong way you've just deepened the hole you'll have to climb out of once you finally check. |
+| "This feels productive" | Undisciplined action wastes time. Skills prevent this. | Productivity without alignment is efficiently doing the wrong thing. The feeling of productivity comes from visible motion, not from correctness — and the more productive it feels, the further you may be from what was actually asked. Skills align motion to goal. |
+| "I know what that means" | Knowing the concept ≠ using the skill. Invoke it. | A skill is a procedure, not a fact. Knowing "what TDD is" doesn't run the red-green-refactor loop for you. Concepts live in memory; procedures only work if you actually execute them. Invoking the skill is what turns knowledge into the procedure running. |
 
 ## Skill Priority
 
