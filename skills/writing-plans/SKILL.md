@@ -11,6 +11,8 @@ Write comprehensive implementation plans assuming the engineer has zero context 
 
 Assume they are a skilled developer, but know almost nothing about our toolset or problem domain. Assume they don't know good test design very well.
 
+**Why this pessimism is the point:** the executor is often a fresh subagent with no conversation history, or a future session with no memory of this one, or a human who hasn't built the mental model you have right now. Any of them will fill the gaps in your plan with *their* assumptions — which are wrong, because they weren't here when you made the decisions. Every unspecified detail becomes a place where the executor guesses, and the guesses compound: a wrong path here, a missed edge case there, and the plan produces something that looks like what you meant but isn't. Writing the plan as if the reader knows nothing isn't insulting them — it's making the plan executable without telepathy. The detail you omit because "it's obvious" is the detail that will be done wrong.
+
 **Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
 
 **Context:** If working in an isolated worktree, it should have been created via the `superpowers:using-git-worktrees` skill at execution time.
@@ -41,6 +43,8 @@ This structure informs the task decomposition. Each task should produce self-con
 - "Implement the minimal code to make the test pass" - step
 - "Run the tests and make sure they pass" - step
 - "Commit" - step
+
+**Why 2-5 minutes, not "implement the feature":** a step is a verification boundary — the point where you run something and confirm it worked before moving on. A large step bundles multiple changes with one verification at the end, so when the verification fails you can't tell which change broke it, and you debug instead of executing. Small steps mean each one is independently verifiable: write test → see it fail (proves the test is wired) → write code → see it pass (proves the code works) → commit (proves it's saved). The granularity exists so failure localizes to one action, not one feature.
 
 ## Plan Document Header
 
@@ -112,6 +116,8 @@ Every step must contain the actual content an engineer needs. These are **plan f
 - "Similar to Task N" (repeat the code — the engineer may be reading tasks out of order)
 - Steps that describe what to do without showing how (code blocks required for code steps)
 - References to types, functions, or methods not defined in any task
+
+**Why placeholders are failures, not stubs:** a placeholder looks like the plan is 90% done when it's actually missing the 10% that does the work. The executor can't implement "appropriate error handling" — they don't know which errors, what's appropriate for this codebase, or what the caller expects. So they either guess (producing code that diverges from your intent) or stall (because the step isn't actionable). A plan with placeholders isn't an incomplete plan, it's a non-executable one — and because the placeholders are scattered through otherwise-complete-looking tasks, the plan *reads* as ready and the gap only surfaces at execution time, when rework is most expensive. If you can't write the real content, the design isn't done yet; go back to brainstorming, don't ship a placeholder.
 
 ## Remember
 - Exact file paths always
