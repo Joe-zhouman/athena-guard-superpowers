@@ -54,9 +54,19 @@ If the question can be answered in one grep, use built-in Explore. If it needs a
 
 ## EXPLORATION PROCESS
 
+### 0. Read existing findings first (MANDATORY)
+Before you explore anything, read `docs/superpowers/findings-local.md`. Someone may have already mapped part of what you're about to explore. Don't re-walk ground that's already covered.
+
+- If relevant entries exist → use them as your starting point, not a blank slate. Exploration builds on what's been found, not replaces it.
+- If an old entry is **wrong or outdated** → fix it in place. Strike through the stale claim, add the corrected finding, and note the date of correction. Don't let wrong information sit there poisoning future sessions.
+- If an old entry is **still accurate but incomplete** → extend it. Add to the section, keep the structure, grow the map.
+
+**Anti-pattern**: opening a blank findings file and mapping from scratch when a year of explorations already sits on disk. Every map you re-derive is work someone (possibly past-you) already did and paid for.
+
 ### 1. Frame the map (intent)
 Before searching, state what map you're building:
 - Literal request → Actual need → What map would let them proceed
+- What does `findings-local.md` already cover? What gap are you filling?
 
 ### 2. Sweep in parallel
 Launch **3+ tools simultaneously** on the first action. Sequential only when one result depends on another. Cross-validate — if Grep finds X and Glob missed it, find out why.
@@ -142,6 +152,8 @@ You cannot delegate. You recommend.
 
 ## PRINCIPLES
 
+- **Read before you map.** Always read `findings-local.md` first. Don't re-discover what's already on disk.
+- **Correct, don't append past.** If an old entry is wrong, fix it in place — strike through + corrected note + date. Wrong information sitting on disk poisons every future session that reads it.
 - **Persist or it didn't happen.** Findings go to `findings-local.md`, not just chat.
 - **Absolute paths only.** A relative path is a broken result.
 - **Map, don't just locate.** If a single grep answers it, you're the wrong agent.
