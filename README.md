@@ -122,19 +122,22 @@ This means the plugin is actually very thin. If you wanted to use these skills w
 
 That said, **this fork does not support other coding agents.** Upstream superpowers targets Claude Code, Codex, Cursor, Gemini CLI, Copilot, OpenCode, and Factory Droid. All of that scaffolding has been stripped out. The skills assume Claude Code's tool set, agent dispatch model, and `@skills-dir` plugin mechanism. Porting to another agent would mean auditing every SKILL.md for harness-specific assumptions — and that work hasn't been done. If you want superpowers on a different agent, use upstream.
 
-### Complementary skills (Matt Pocock)
+### Complementary skills
 
-Four skills from [mattpocock/skills](https://github.com/mattpocock/skills) are bundled as optional supplements. They don't participate in the athena workflow — they're here so you don't have to install them separately:
+Four skills from [mattpocock/skills](https://github.com/mattpocock/skills) + two athena originals, bundled as optional supplements. They don't participate in the athena workflow — they're here so you don't have to install them separately:
 
 | Skill | What it does | When to use |
 |-------|-------------|-------------|
 | **diagnosing-bugs** | 6-phase diagnosis loop for hard bugs. Build a tight feedback loop first, then hypothesise, instrument, fix, and regression-test | The bug has no clear repro and you don't know which module is broken. cancer handles bugs with known repros; diagnosing-bugs handles everything else |
-| **handoff** | Compress the current conversation into a handoff document for a fresh agent | You're deep in a session and need to hand off to another agent (or your future self). Writes to OS temp dir |
 | **to-prd** | Synthesize the conversation into a PRD and publish it to the project issue tracker | You need an external-facing PRD from a design session. Requires `/setup-matt-pocock-skills` for issue tracker config |
 | **prototype** | Build a throwaway terminal app or UI variant set to answer a design question, then delete it | Brainstorming alone can't settle a logic/state-model question and you need to *feel* it working. Two branches: logic (CLI) and UI (multi-variant routing) |
 | **grill-me** | Relentless Socratic interview about a plan or design — one question at a time, every question with a recommended answer | Stress-testing any plan or design. The original Matt Pocock grill-me that inspired athena's brainstorming interview style. Use standalone when you don't need the full brainstorming flow |
+| **discuss-first** | Don't start coding. Ask questions until you and the user agree the task is clearly understood. Only then begin. | You want the agent to stop guessing and actually talk to you first. Not a Matt skill — athena original |
+| **handoff** | Compress the current conversation into a handoff document for another agent to pick up | You're deep in a session and need to hand off to another agent (or your future self). Writes to OS temp dir |
 
-These are **pure Matt Pocock**, unmodified — except grill-me, which is the original pre-athena version. They load alongside athena skills and can be invoked at any time. They don't interfere with the main workflow — they're just there when you need them. Install one more thing, get the whole toolbox.
+These load alongside athena skills and can be invoked at any time. They don't interfere with the main workflow — they're just there when you need them. Install one more thing, get the whole toolbox.
+
+**Why some are slash-command-only.** Three of these — `grill-me`, `discuss-first`, and `handoff` — have `disable-model-invocation: true`. The model will never auto-invoke them. This is deliberate: they are tools for *you* to reach for, not tools for the agent to decide to use. `/grill-me` when you want to stress-test your own plan. `/discuss-first` when the agent is jumping ahead and you need to pull it back. `/handoff` when you need to hand the conversation to another agent. The agent doesn't know when you want these — only you do. That's the difference between a skill (auto-invoked by context) and a slash command (invoked by the user).
 
 ### Skill authoring: skill-creator-plus
 
@@ -231,12 +234,13 @@ The orchestration skills use `opus`/`fable` for design and review. Implementatio
 **Meta**
 - **using-superpowers** — Bootstraps the skills system at session start
 
-**Complementary (from mattpocock/skills)**
+**Complementary (4 from Matt Pocock + 2 athena originals)**
 - **diagnosing-bugs** — 6-phase loop for hard bugs with no clear repro
-- **handoff** — Compress conversation into a handoff doc for another agent
 - **to-prd** — Synthesize design session into a PRD on the issue tracker
 - **prototype** — Throwaway code to answer a design question, then delete
-- **grill-me** — Standalone Socratic interview for stress-testing any plan
+- **grill-me** — Standalone Socratic interview (slash command only)
+- **discuss-first** — Stop and clarify before coding (slash command only)
+- **handoff** — Compress conversation into a handoff doc (slash command only)
 
 ### Agents
 
@@ -261,7 +265,7 @@ A personal fork of [obra/superpowers](https://github.com/obra/superpowers) rebui
 
 ### File layout
 
-- `skills/` — 19 skills (14 core + 5 complementary from mattpocock/skills), auto-loaded via `@skills-dir`. Bootstrap entry: `skills/using-superpowers/SKILL.md`
+- `skills/` — 20 skills (14 core + 4 Matt Pocock + 2 athena originals), auto-loaded via `@skills-dir`. Bootstrap entry: `skills/using-superpowers/SKILL.md`
 - `user-agents/` — 9 agent `.md` definitions + `refs/` for progressive disclosure. Copied to `~/.claude/agents/` on install, not symlinked. Named `user-agents/` to prevent @skills-dir auto-discovery
 - `hooks/` — SessionStart hook, injects `using-superpowers` bootstrap at every session start
 - `docs/athena/` — Human-facing docs (OVERVIEW.md, INSTALL.md)
@@ -324,7 +328,7 @@ This is just the *plugin overhead*. Your actual code context (source files, test
 
 | Resource | Size | Equivalent |
 |----------|------|------------|
-| 19 skill SKILL.md files (14 core + 5 complementary) | 177 KB | ~44,000 tokens |
+| 20 skill SKILL.md files (14 core + 4 Matt + 2 athena) | 178 KB | ~44,500 tokens |
 | 9 subagent definitions | 77 KB | ~19,000 tokens |
 | 9 progressive-disclosure refs | 22 KB | ~5,500 tokens |
 | **Total on-disk instruction mass** | **~260 KB** | **~65,000 tokens** |
