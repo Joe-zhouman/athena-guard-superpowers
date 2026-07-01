@@ -89,7 +89,7 @@ The 6 prompt-template files were deleted. Each agent IS its own personality and 
 | Guardian | Zodiac | Personality → Role | Status |
 |----------|--------|-------------------|--------|
 | **leo** | 狮子 | Performer, showman, commands attention → **Frontend / UI specialist**: layouts, animations, visual polish — the part of development that faces the audience | No pressing need yet, but the personality fit is obvious |
-| **gemini** | 双子 | Mercurial, restless, ideas collide and mutate → **Idea generator / brainstorm sparring partner**: throws out angles you didn't consider, pivots mid-sentence, keeps the design conversation from settling too early | Same — I don't have a use case that needs this yet |
+| **gemini** | 双子 | Mercurial, multi-perspective, restless mind that collides ideas → **Product manager / requirements wrangler**: translates vague user intent into sharp requirements, catches blind spots by switching viewpoints mid-sentence, keeps the design honest about what actually matters to the user | Same — I don't have a use case that needs this yet |
 
 **Aquarius (水瓶)** — still thinking. No personality→role click yet.
 
