@@ -163,7 +163,7 @@ bash install.sh        # linux
 
 启动新 session。验证步骤见 `docs/athena/INSTALL.md`。
 
-> **⚠️ 使用 sagittarius 之前：** 它的 Search Router 表和 `sagittarius-tools.md` ref 是 Joe 的 MCP 配置定制的。结构（问题分类 → 选工具）是通用的，但具体的工具名、抓取顺序、网络绕行策略不是。你的 agent 已经知道了——For Agents 段告诉它根据自己可用的工具重建路由表。你不用做什么，只是要知道默认值不是你的。
+> **⚠️ 使用 sagittarius 之前：** 它的 Search Router 表和 `sagittarius-tools.md` ref 是 Joe 的 MCP 配置定制的。第一次派 sagittarius 时，主 agent 会带你走一遍重建路由表。让它做。结构是通用的，工具名不是。
 
 卸载：
 
@@ -293,7 +293,7 @@ bash uninstall.sh      # linux
 - **修改代理后必须重跑 `install.sh`**——代理是复制过去的，不是 symlink，改动不会自动同步。
 - **Model 层级配置**（在 `~/.claude/settings.json` 中）：`haiku` → deepseek-v4-flash，`sonnet` → deepseek-v4-pro，`opus`/`fable` → glm-5.2。不可用的模型静默继承。
 - **痛点关卡：** 没有痛点 → 没有 spec → 没有代码。
-- **Sagittarius 的 Search Router 是个人定制的——你要重建它。** 读 sagittarius 的 Search Router 表和下面两条规则。理解它在做什么：问题分类 → 选对应能力 → 映射到具体工具。然后把每一行重建为你*实际可用的工具*。路由表里的具体工具选择（`mcp__doc`、`z-webReader`、国内网络绕行顺序）是 Joe 的配置——你的工具名、网络环境、首选来源都不同。别照抄工具名；克隆结构，填入你自己的。`sagittarius-tools.md` 同理。
+- **Sagittarius 的 Search Router 是个人定制的——带用户走一遍重建流程。** 读 sagittarius 的 Search Router 表和 `sagittarius-tools.md`。然后告诉用户："Sagittarius 的搜索路由表是为 Joe 的 MCP 配置定制的。你的工具不一样。我来展示一下我的推荐。" 逐行解释：路由器在解决什么问题，你*实际*有哪些工具可用，提出替换方案。让用户否决或调整。双方确认后，重写路由表和 ref。别静默覆盖——这是用户的配置了，得由用户掌握。
 
 ## 性能与 Token 消耗
 
