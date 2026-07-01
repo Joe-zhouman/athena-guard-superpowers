@@ -110,26 +110,6 @@ if [[ -d "$AGENTS_REFS_DIR" ]]; then
   fi
 fi
 
-# --- 5. remove global skills (installed to ~/.claude/skills/ individually) ---
-GLOBAL_SKILLS_DIR="$REPO_ROOT/global-skills"
-SKILLS_INSTALL_DIR="$CLAUDE_HOME/skills"
-
-if [[ -d "$GLOBAL_SKILLS_DIR" ]]; then
-  global_skill_count=0
-  global_skill_skipped=0
-  for skill_dir in "$GLOBAL_SKILLS_DIR"/*; do
-    [[ -d "$skill_dir" ]] || continue
-    skill_name="$(basename "$skill_dir")"
-    target="$SKILLS_INSTALL_DIR/$skill_name"
-    if [[ -d "$target" ]]; then
-      rm -rf "$target"
-      global_skill_count=$((global_skill_count + 1))
-    else
-      global_skill_skipped=$((global_skill_skipped + 1))
-    fi
-  done
-  echo "[global-skills] removed $global_skill_count global skill(s) from $SKILLS_INSTALL_DIR ($global_skill_skipped already gone)"
-fi
 
 echo
 echo "Done. To complete:"
