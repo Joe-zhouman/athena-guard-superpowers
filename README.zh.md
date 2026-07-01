@@ -327,7 +327,7 @@ SessionStart hook 强制在每次 session 开始时读取 `using-superpowers`（
 
 如果你直接用 Claude Opus（像上游 superpowers 假设的那样），性价比等式不同——Claude 足够聪明，不需要这么多手把手指导，指令消耗可能大于节省。如果你像我一样用分层模型配置（GLM-5.2 编排 + DeepSeek 工人），这套开销是**净正收益**：编排者的昂贵 token 被节省，工人的便宜 token 被用于防止昂贵错误的指导。我每天都在用，token 预算是能跑通的。
 
-**如果你是成本敏感型用户，三思。** 这不是轻量插件。如果你的上下文窗口经常塞满，或者 token 预算吃紧，这可能不适合你。上游 superpowers 也不轻量——想要轻量的，去拿 [Matt Pocock 的 skills](https://github.com/mattpocock) 自由组合。实际上，本 repo 设计上就是和他的 skills 一起用的——你可以在工作流的任意节点插入他的 skill，互不打架。唯一的耦合点是文件持久化层（`docs/superpowers/`）：athena 的代理在这里读写 findings、spec 和 review。Matt 的 skills 不碰这些路径，所以没有冲突。除此之外，随便混搭。
+**如果你是成本敏感型用户，三思。** 这不是轻量插件。如果你的上下文窗口经常塞满，或者 token 预算吃紧，这可能不适合你。上游 superpowers 也不轻量——想要轻量的，去拿 [Matt Pocock 的 skills](https://github.com/mattpocock/skills) 自由组合。实际上，本 repo 设计上就是和他的 skills 一起用的——你可以在工作流的任意节点插入他的 skill，互不打架。两个 repo 都信仰文件持久化——只是落地路径不同。Matt 的 skills 写到 ADR、PRD 和 GitHub Issues；athena 的代理写到 `docs/superpowers/`。不同路径，不同格式，同一哲学，零碰撞。除此之外，随便混搭。
 
 ## 鸣谢
 
