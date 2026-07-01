@@ -2,7 +2,7 @@
 
 The concrete "which tool, which args" for each research shape. sagittarius's body carries the *router* (question type → capability needed); this file carries the *tool calls* for the capabilities.
 
-**Read this after PHASE 0 routes the question**, before you start hunting. The toolset grows over time — when a new tool arrives, add it under the capability it serves; don't rewrite the router in body.
+**Read this after PHASE 1 routes the question**, before you start hunting. The toolset grows over time — when a new tool arrives, add it under the capability it serves; don't rewrite the router in body.
 
 ---
 
