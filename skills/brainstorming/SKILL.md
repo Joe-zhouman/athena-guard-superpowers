@@ -23,7 +23,7 @@ Every project goes through this process. A todo list, a single-function utility,
 
 You MUST create a task for each of these items and complete them in order:
 
-1. **Read the room** — read `docs/superpowers/glossary.md`, `findings-local.md`, `findings-external.md`, and any prior `specs/` if they exist. These reconstruct context from previous sessions. Skip files that don't exist yet.
+1. **Read the room** — read `docs/superpowers/glossary.md`, `findings-local.md`, `findings-external.md`, and any prior `specs/` if they exist. These reconstruct context from previous sessions. Skip files that don't exist yet — but note that `glossary.md` doesn't exist yet: when a term crystallizes in the grill (step 4), you'll create it from the template (see "Glossary" below), not skip it forever.
 2. **Explore (dispatch virgo / sagittarius)** — based on what the task needs and what you already know, decide: dispatch virgo for local codebase mapping, sagittarius for external research, both in parallel for cross-domain projects, or neither if you already have enough context. They return structured findings blocks — **you write them to** `findings-local.md` / `findings-external.md`. (They have no Write permission; delivering the block is their job, writing the file is yours.)
 3. **Offer visual companion** (if topic will involve visual questions) — this is its own message, not combined with a grill question. See the Visual Companion section below.
 4. **Grill the user** — relentless interview to sharpen the idea, one question at a time, each with a recommended answer. Resolve terminology into `glossary.md` as it crystallizes. See the Grill section below.
@@ -113,12 +113,12 @@ The grill rules:
 - **Resolve terminology into `glossary.md` as it crystallizes.** When a fuzzy term gets pinned down, write it to `docs/superpowers/glossary.md` right then — don't batch. Use the format below. *Why: a term that just got pinned down is at peak clarity in this exact moment — both of you just agreed what it means. If you wait to batch-write it later, you'll reconstruct the meaning from memory, which is exactly how definitions drift. Writing it immediately also makes it referenceable for the very next question, so you don't re-litigate it five minutes later in the same session.*
 - **Challenge conflicts immediately.** If the user uses a term in a way that contradicts `glossary.md`, call it out: "Your glossary defines 'cancellation' as X, but you seem to mean Y — which is it?" Don't silently pick one. *Why: silently picking one means you've let the term fork — the glossary says X, the user means Y, and every subsequent answer is ambiguous about which is in play. The mismatch only surfaces later as a bug in the design ("wait, I thought cancellation meant..."). Surfacing it now costs one clarification; surfacing it after you've built on the wrong meaning costs a re-design.*
 
-Glossary entry format (canonical term + definition + `_Avoid_` aliases):
-```markdown
-**<Canonical Term>**:
-<1-2 sentences: what it IS, not what it DOES>
-_Avoid_: <synonym1>, <synonym2>
-```
+Glossary — **you own this file**. If `docs/superpowers/glossary.md` doesn't exist when a term first crystallizes, create it from the template at `glossary-template.md` (shipped alongside this skill — read it once, then write `docs/superpowers/glossary.md` from its starter skeleton). Don't grill without a place to settle terms.
+
+The glossary has three sections (full format + rules in `glossary-template.md`):
+- **Terms** — `**Canonical Term**:` + tight definition (what it IS) + `_Avoid_: aliases`.
+- **Relationships** — one line each (`An X holds many Y`). The structure between terms is the domain model; don't skip it.
+- **Flagged ambiguities** — terms that used to mean two things, and how you resolved them. Add one every time you and the user untangle a drifted word.
 
 The glossary is **only terminology** — never implementation notes, scratch, or design decisions. Those go in the spec. If you can't decide whether something belongs in the glossary, ask: is this a *term unique to this project's domain*? If yes, glossary. If it's a general concept or an implementation choice, no.
 
