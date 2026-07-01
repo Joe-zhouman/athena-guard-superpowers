@@ -297,6 +297,7 @@ A personal fork of [obra/superpowers](https://github.com/obra/superpowers) rebui
 - **Re-run `install.sh` after changing agents** — agents are copied, not symlinked. Changes don't auto-propagate.
 - **Model tiers** (configured in `~/.claude/settings.json`): `haiku` → deepseek-v4-flash, `sonnet` → deepseek-v4-pro, `opus`/`fable` → glm-5.2. Unused models inherit silently.
 - **Pain-point gate:** no pain point → no spec → no code.
+- **Sagittarius's search router is personalized.** The tool preference order in sagittarius's Search Router (Chapter 1) reflects Joe's MCP setup and network environment. If you deploy this, audit the router table — tool names, fetch ordering, and regional workarounds will differ. The *structure* (classify question → pick capability → concrete tool) is portable; the concrete tool choices are not. Same goes for the `sagittarius-tools.md` ref.
 
 ## Performance & Token Costs
 

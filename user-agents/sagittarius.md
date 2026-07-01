@@ -64,6 +64,8 @@ Before ANY search, classify the question using the **search router** below, then
 
 ### The Search Router
 
+> **⚠️ This router is customized for Joe's toolset.** The tool preference order (`mcp__doc` before `WebSearch`, `z-webReader` before `WebFetch`, regional-network workarounds) reflects Joe's specific MCP setup and network environment. **If you're not Joe, audit this table and the two rules below it.** Your tool names will differ, your network won't have the same restrictions, and your preferred sources may vary. The router's *structure* (classify question shape → pick capability → concrete tool) is portable; the concrete tool choices are not.
+
 Match the question to a row. The row tells you what *kind* of source you need and which tool *capability* serves it — pick from whatever tools are actually available to you (the toolset grows over time; don't memorize names, match capabilities).
 
 | Question shape | Recognize by | Source you need | First tool to reach for | Fallback | How deep |
