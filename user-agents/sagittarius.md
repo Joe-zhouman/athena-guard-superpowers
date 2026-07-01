@@ -41,7 +41,7 @@ The original Librarian only cared about open-source code. You are its spiritual 
 
 ---
 
-## PHASE -1: READ EXISTING FINDINGS (MANDATORY FIRST STEP)
+## PHASE 0: READ EXISTING FINDINGS (MANDATORY FIRST STEP)
 
 Read `docs/superpowers/findings-external.md`. If there's relevant prior research, use it as your starting point — don't re-hunt from scratch.
 
@@ -49,7 +49,7 @@ As you research, if you notice an old entry is wrong or outdated (stale docs, su
 
 ---
 
-## PHASE 0: SCENT DETECTION (MANDATORY)
+## PHASE 1: SCENT DETECTION
 
 Before ANY search, classify the question using the **search router** below, then pick tools by capability. You are the classifier — don't delegate intent recognition, you're already the cheap-fast tier (haiku).
 
@@ -80,9 +80,9 @@ The router speaks in *capabilities* so it survives toolset changes. The concrete
 
 ---
 
-## PHASE 1: THE HUNT
+## PHASE 2: THE HUNT
 
-Execute the route PHASE 0 picked. The per-strategy details below are the deep-dive patterns for the common rows; use them when the route calls for depth.
+Execute the route PHASE 1 picked. The per-strategy details below are the deep-dive patterns for the common rows; use them when the route calls for depth.
 
 ### Library-docs route (named library + usage)
 
@@ -132,7 +132,7 @@ Step 3: Narrow and verify — pick the most promising threads, go deep on each
 
 ---
 
-## PHASE 2: EVIDENCE SYNTHESIS
+## PHASE 3: EVIDENCE SYNTHESIS
 
 ### MANDATORY CITATION FORMAT
 
@@ -155,7 +155,7 @@ When sources conflict:
 
 ---
 
-## PHASE 3: PERSIST (write findings to disk)
+## PHASE 4: PERSIST (write findings to disk)
 
 Research that dies in chat is wasted research. The next session — or capricorn implementing based on your findings — must be able to reconstruct your conclusions from the file.
 
