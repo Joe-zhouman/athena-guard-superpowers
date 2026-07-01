@@ -97,3 +97,15 @@ scorpio / taurus / libra 都是**独立 context 审查别人写的**——这是
 - **haiku**(搜索/研究):virgo / sagittarius
 
 不可用的 model 静默回退到 inherit。
+
+## For Agents
+
+<!-- 机器可读。主 agent 通过 grep 定位此段。包含代理调度和持久化规则，不需要读全文即可操作。 -->
+
+### 关键规则
+
+- **持久化是强制的。** virgo 写 `findings-local.md`，sagittarius 写 `findings-external.md`，scorpio/taurus/aries 写 `docs/superpowers/reviews/`，cancer 写 `docs/superpowers/diagnoses/`。主 agent 读盘重建 context。
+- **独立审查不能省略。** libra 审 plan/spec，scorpio 审 spec 符合性，taurus 审代码质量。实现者和审查者必须是不同 agent、不同 context。
+- **流程入口是 brainstorming。** 其他流程都从 brainstorming 的输出出发。bug 修复走平行流程（cancer 直接介入），跳过 brainstorming/writing-plans。
+- **子代理 model 分层：** fable → capricorn + scorpio（高认知任务）；sonnet → cancer / taurus / libra / aries / pisces（常规审查和分析）；haiku → virgo / sagittarius（搜索和研究）。不可用的 model 静默回退到 inherit。
+- **`general-purpose` 已被完全替换。** 所有调度点都按名字派发。看到 `general-purpose` 就是 bug。

@@ -102,3 +102,37 @@ bash uninstall.sh
 | `hooks/session-start` | 加 hash-pin(C1 防 SKILL.md 篡改);`hooks/update-skill-hash`、`hooks/.skill-hash` 新增 |
 
 升级时:`git diff` 官方新版与本 fork,把官方改进 port 进来,**但保留上面这些 athena 改动**。
+
+## For Agents
+
+<!-- Machine-readable. 安装/卸载规则速查。主 agent 通过 grep 定位。 -->
+
+### Install
+
+```bash
+git clone <this-repo> ~/athena-superpowers
+cd ~/athena-superpowers && bash install.sh   # linux
+# .\install.ps1                               # windows
+```
+
+`install.sh` 做两件事：
+1. Symlink `skills/` + `hooks/` → `~/.claude/skills/athena-superpowers/`（下次 session 生效）
+2. 复制 `user-agents/*.md` + `user-agents/refs/` → `~/.claude/agents/`（用户级全局 agent 保留 `permissionMode`/`mcpServers`）
+
+### Uninstall
+
+```bash
+bash uninstall.sh   # linux
+# .\uninstall.ps1   # windows
+```
+
+删除 symlink、agent 文件、ref 文件。不影响 repo 克隆本身。
+
+### 关键规则
+
+- **安装前必须先禁用官方 superpowers**（`~/.claude/settings.json` 中设 `"superpowers@claude-plugins-official": false`）。两套 SessionStart hook 同时注入会导致冲突指令。
+- **修改 agent `.md` 文件后必须重跑 `install.sh`。** Agent 是复制过去的，不是 symlink，改动不会自动同步。
+- **修改 hooks 后需执行 `/reload-plugins` 或启动新 session。**
+- **`claude plugin update` 对 `@skills-dir` 插件是 no-op**（没有 marketplace 源）。更新靠 `git pull` + `install.sh`。
+- **不支持 macOS。** 仅 Linux 和 Windows。
+- **跨平台脚手架（Codex/Cursor/Gemini/Copilot/OpenCode）已全部移除。** 仅支持 Claude Code。

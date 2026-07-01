@@ -1,3 +1,5 @@
+[English](README.md) | [中文](README.zh.md)
+
 # athena-guard-superpowers
 
 > Personal fork of [obra/superpowers](https://github.com/obra/superpowers) (~5.0.x era), rebuilt for a multi-model, subagent-first workflow with file persistence and zodiac-personified subagents. Claude Code only. A frankenstein stitched together from superpowers, [grill-me](https://github.com/mattpocock/grill-me), and [Oh-My-OpenCode](https://github.com/oh-my-opencode/oh-my-opencode).
@@ -227,6 +229,105 @@ This is the design philosophy behind the `writing-spec` skill and the fork as a 
 2. **Design rationale must explain WHY.** A spec without rationale is a recipe without reasoning. Future maintainers need to know which constraints were deliberate and which were accidental.
 3. **Independent review at every gate.** You can't review your own output. libra, scorpio, and taurus exist because self-review is a blind spot.
 4. **Write it down or lose it.** Context is ephemeral; files persist. Every discovery, every decision, every review verdict goes to disk.
+
+## For Agents
+
+<!-- Machine-readable. Human readers: skip to Credits. -->
+
+### What this is
+
+A personal fork of [obra/superpowers](https://github.com/obra/superpowers) rebuilt for multi-model orchestration. Replaces `general-purpose` subagents with 9 specialized zodiac-personified guardians. GLM-5.2 orchestrates design/planning; DeepSeek models execute implementation/review. Claude Code only.
+
+### File layout
+
+- `skills/` — 14 composable skills, auto-loaded via `@skills-dir`. Bootstrap entry: `skills/using-superpowers/SKILL.md`
+- `user-agents/` — 9 agent `.md` definitions + `refs/` for progressive disclosure. Copied to `~/.claude/agents/` on install, not symlinked. Named `user-agents/` to prevent @skills-dir auto-discovery
+- `hooks/` — SessionStart hook, injects `using-superpowers` bootstrap at every session start
+- `docs/athena/` — Human-facing docs (OVERVIEW.md, INSTALL.md)
+- `docs/superpowers/` — Agent persistence directory (specs, plans, findings, reviews, diagnoses)
+- `install.sh` / `install.ps1` — Setup (symlinks skills to `~/.claude/skills/`, copies agents to `~/.claude/agents/`)
+- `uninstall.sh` / `uninstall.ps1` — Teardown (removes symlinks, agents, refs)
+
+### Agent dispatch reference
+
+| Guardian | Dispatch when | Model tier |
+|----------|--------------|------------|
+| **capricorn** | Implementation: TDD, vertical slice, commit | fable |
+| **scorpio** | After capricorn — spec compliance review | fable |
+| **taurus** | After scorpio — code quality, file:line citations | sonnet |
+| **libra** | Plan/spec review during brainstorming/writing-plans | sonnet |
+| **cancer** | Bug report: diagnose, fix, regress | sonnet |
+| **virgo** | Codebase map needed: explore, persist findings to disk | haiku |
+| **sagittarius** | External research needed: library docs, API behavior | haiku |
+| **aries** | After "done" — adversarial testing; mandatory for skills/agents/hooks/MCP changes | sonnet |
+| **pisces** | Text polish: de-AI-ification, human-sounding prose | sonnet |
+
+### Key rules
+
+- **File persistence is mandatory.** Every discovery goes to `docs/superpowers/`. Skills read from disk before asking the user. Wired into every skill definition.
+- **Independent review at every gate.** Never self-review. libra/scorpio/taurus exist because self-review is a blind spot.
+- **Never dispatch `general-purpose`.** All skills dispatch by name. If `general-purpose`, `implementer-prompt`, or `spec-reviewer-prompt` appears in any `skills/` file, it's a bug — remove it.
+- **One task per subagent, fresh subagent per task.** Isolated context per implementation task.
+- **Official superpowers must be disabled** before install — both inject SessionStart hooks, conflict guaranteed.
+- **Re-run `install.sh` after changing agents** — agents are copied, not symlinked. Changes don't auto-propagate.
+- **Model tiers** (configured in `~/.claude/settings.json`): `haiku` → deepseek-v4-flash, `sonnet` → deepseek-v4-pro, `opus`/`fable` → glm-5.2. Unused models inherit silently.
+- **Pain-point gate:** no pain point → no spec → no code.
+
+## Performance & Token Costs
+
+**This plugin is heavy.** It prioritizes correctness and process over token efficiency. Every design decision — specialized subagents, mandatory independent review, file persistence, "why" explanations — costs tokens. I accept that trade-off. Before you install, understand what you're signing up for.
+
+### What you pay, and when
+
+**Every session, just to start up (~4K tokens):**
+
+The SessionStart hook injects a mandatory read of `using-superpowers` (11,624 bytes, ~2,900 tokens) so the agent knows how to find and invoke skills. The hook itself adds another ~1,200 tokens of preamble. This cost is unavoidable — it's the price of making the skills system work.
+
+**Every full workflow cycle (~40–50K tokens):**
+
+A typical feature from brainstorm to merge with 3 implementation tasks:
+
+| Phase | What loads | Token overhead |
+|-------|-----------|----------------|
+| Session startup | using-superpowers + hook | ~4,100 |
+| Brainstorming | brainstorming SKILL.md (4,300 tokens), virgo/sagittarius agent defs (~4,400 tokens if both dispatched) | ~4,300–8,700 |
+| Writing spec | writing-spec SKILL.md (3,300 tokens), libra agent def (1,700 tokens) | ~5,000 |
+| Writing plan | writing-plans SKILL.md (2,100 tokens), libra again (1,700 tokens) | ~3,800 |
+| Per task ×3 | capricorn (2,400) + scorpio (1,700) + taurus (1,600) + skill overhead | ~5,700 per task |
+| File persistence | Reading findings, glossary, prior specs; writing reviews and progress | ~3,000–5,000 |
+| **Approximate total** | | **~42,000–50,000 tokens** |
+
+This is just the *plugin overhead*. Your actual code context (source files, test output, git diffs) adds on top.
+
+### Standing costs
+
+| Resource | Size | Equivalent |
+|----------|------|------------|
+| 14 skill SKILL.md files | 160 KB | ~40,000 tokens |
+| 9 subagent definitions | 77 KB | ~19,000 tokens |
+| 9 progressive-disclosure refs | 22 KB | ~5,500 tokens |
+| **Total on-disk instruction mass** | **~260 KB** | **~65,000 tokens** |
+
+Not all of this loads at once — skills load on demand, agents only when dispatched. But in a full workflow cycle, most of it does get pulled in.
+
+### Where the cost pays for itself
+
+These aren't frivolous tokens. Each overhead has a specific failure mode it prevents:
+
+| Cost | Prevents |
+|------|----------|
+| "Why" explanations in every agent definition | Subagents going off-script on cheap models, burning more tokens on corrections than the explanation cost |
+| Mandatory libra/scorpio/taurus reviews | Shipping bugs or wrong designs that cost orders of magnitude more to fix later |
+| File persistence (findings, specs, glossary) | Re-deriving the same context every session because the conversation was truncated |
+| Specialized agents over general-purpose | A `general-purpose` subagent burning tokens on orientation before it even starts the real work. A specialized agent loads its playbook and goes |
+
+A single misdirected subagent on a cheap model wastes more tokens than the "why" paragraphs across an entire session. A single bug shipped because review was skipped costs more in debugging hours than every libra dispatch combined. The overhead is real, but it's buying insurance against significantly larger losses.
+
+### Bottom line
+
+If you use Claude Opus directly (as upstream superpowers assumes), the cost-to-benefit math is different — Claude is smart enough to not need most of this hand-holding, and you'd pay more for the instructions than they save. If you use a tiered model setup like mine (GLM-5.2 orchestrator + DeepSeek workers), the overhead is **net positive**: the orchestrator's expensive tokens are conserved, and the workers' cheap tokens are spent on guidance that prevents expensive mistakes. I've been running this daily and the token budget works out.
+
+**If you're cost-sensitive, think twice.** This is not a lightweight plugin. If your context window routinely fills up, or if you're on a tight token budget, this might not be for you. Upstream superpowers is leaner by design.
 
 ## Credits
 
