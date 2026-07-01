@@ -64,7 +64,7 @@ MCP parameter poisoning:
   it as authoritative or as data?
 
 Cross-agent context pollution:
-- Can a subagent's persisted output (findings.md, reviews/, diagnoses/)
+- Can a subagent's persisted output (findings-local.md, findings-external.md, reviews/, diagnoses/)
   be poisoned by hostile content, then read back into a future session
   as if it were trusted?
 - Do two parallel agents writing to overlapping files corrupt each other?
