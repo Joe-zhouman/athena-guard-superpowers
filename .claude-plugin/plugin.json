@@ -1,7 +1,7 @@
 {
   "name": "athena-superpowers",
-  "description": "Athena-flavored superpowers: core skills (TDD, debugging, plans) wired to 8 single-purpose subagents (capricorn/scorpio/taurus/libra/virgo/sagittarius/aries/pisces) that persist findings to disk. Forked from obra/superpowers 5.1.0.",
-  "version": "5.1.0-athena",
+  "description": "Athena's Guardians: 9 zodiac-personified subagents, pain-point-driven spec writing, grill-me-style brainstorming. Claude Code only. Forked from obra/superpowers.",
+  "version": "0.1.0",
   "author": {
     "name": "Joe-zhouman",
     "email": "joe_zm@foxmail.com"

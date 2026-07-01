@@ -1,19 +1,19 @@
 {
-  "name": "athena-superpowers-dev",
-  "description": "Athena-flavored superpowers marketplace",
+  "name": "athena-guard-superpowers-dev",
+  "description": "Athena's Guardians marketplace (dev)",
   "owner": {
-    "name": "Jesse Vincent",
-    "email": "jesse@fsck.com"
+    "name": "Joe-zhouman",
+    "email": "joe_zm@foxmail.com"
   },
   "plugins": [
     {
       "name": "athena-superpowers",
-      "description": "Athena-flavored superpowers: core skills wired to 8 single-purpose subagents that persist findings to disk",
-      "version": "5.1.0-athena",
+      "description": "Athena's Guardians: 9 zodiac-personified subagents, pain-point-driven spec writing, grill-me-style brainstorming. Claude Code only.",
+      "version": "0.1.0",
       "source": "./",
       "author": {
-        "name": "Jesse Vincent",
-        "email": "jesse@fsck.com"
+        "name": "Joe-zhouman",
+        "email": "joe_zm@foxmail.com"
       }
     }
   ]

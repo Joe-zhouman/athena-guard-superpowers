@@ -1,21 +1,85 @@
-# Superpowers Release Notes
+# Release Notes
 
-## v5.1.1-athena (unreleased)
+## v0.1.0 (2024-12-05) — First athena release
 
-Fork-specific changes by [Joe-zhouman](https://github.com/Joe-zhouman/athena-guard-superpowers).
+Initial fork of [obra/superpowers](https://github.com/obra/superpowers) (~5.0.x era). This is early-stage software — expect rough edges, missing pieces, and breaking changes.
 
-### Identity
+### Fork identity
 
-- **Author, homepage, and repository** in `plugin.json` updated to Joe-zhouman / athena-guard-superpowers.
+- **Author, homepage, repository** updated to [Joe-zhouman](https://github.com/Joe-zhouman) / [athena-guard-superpowers](https://github.com/Joe-zhouman/athena-guard-superpowers)
+- **Version reset** to 0.1.0 — this is v0 software, not a continuation of upstream's version line
 
-### Fix: agents no longer appear as both plugin agents and global agents
+### 9 zodiac-personified subagents: "Athena's Guardians"
 
-- **`agents/` renamed to `user-agents/`** — Claude Code's `@skills-dir` plugin mechanism auto-discovers any `agents/` directory and registers them as plugin agents (which have `hooks`/`mcpServers`/`permissionMode` stripped). Since athena agents need full capabilities as user-level globals, renaming to `user-agents/` prevents the duplicate registration. Agents now only appear once, as global user-level agents under `~/.claude/agents/`.
-- `install.sh`, `tests/test-install.sh`, `CLAUDE.md`, `README.md`, and `docs/athena/OVERVIEW.md` updated to reference the new directory name.
+Replaced upstream's `general-purpose` subagent dispatch with 9 named, personality-driven subagents. Each agent is built on a zodiac stereotype — personality first, responsibility grows out of it. Naming inspired by [Oh-My-OpenCode](https://github.com/oh-my-opencode/oh-my-opencode). Name "Athena's Guardians" from *Saint Seiya* (圣斗士星矢).
 
-### New: uninstall script
+See `docs/athena/OVERVIEW.md` for the full catalog.
 
-- `uninstall.sh` reverses everything `install.sh` does: removes the plugin symlink and the 9 agent files + 9 ref files from `~/.claude/agents/`. Only touches files installed by install.sh — other user agents are left alone. Asks for confirmation before removing anything. Idempotent.
+### Brainstorming: grill-me + superpowers
+
+Merged [Matt Pocock's grill-me](https://github.com/mattpocock/grill-me) interview discipline (one question at a time, every question with a recommended answer, resolve the decision tree branch-by-branch) with superpowers' design flow. Terminology resolved into `glossary.md` immediately as it crystallizes. Spec phase delegated to new `writing-spec` skill.
+
+### writing-spec: pain-point-driven spec format
+
+New skill (merged from Joe's global `spec-writer`). Enforces pain-point-driven development: no pain point → no spec → no code. Each section of the spec format exists to answer one question in a chain of reasoning. Mandatory libra review + user review gate. Hands off to `writing-plans`.
+
+### File persistence is mandatory
+
+All agents persist findings to `docs/superpowers/`. All skills read from disk before asking the user. `docs/superpowers/findings-local.md`, `findings-external.md`, `glossary.md`, `specs/`, `plans/`, `reviews/`, `diagnoses/`, `progress.md` — wired into every skill definition.
+
+### libra replaces Self-Review
+
+Upstream's Self-Review pattern replaced with independent libra dispatch at every gate (brainstorming, writing-plans, writing-spec). You wrote it — you're not the best reviewer of it.
+
+### Cross-platform scaffolding removed
+
+All Codex / Cursor / Gemini CLI / Copilot / OpenCode / Factory Droid support stripped. This fork is **Claude Code only**.
+
+### Install / uninstall scripts
+
+- `install.sh` (Linux) + `install.ps1` (Windows) — symlinks plugin into `~/.claude/skills/`, copies agents to `~/.claude/agents/`
+- `uninstall.sh` (Linux) + `uninstall.ps1` (Windows)` — reverses everything, only touches athena files
+- `agents/` renamed to `user-agents/` — prevents @skills-dir plugin auto-discovery from registering agents as both plugin and global
+- `tests/test-install.sh` — TDD-validated install assertions
+
+### Multi-model tiered architecture
+
+Designed for GLM-5.2 (orchestrator, Opus/Fable tier) + DeepSeek-V4-Pro (Sonnet tier) + DeepSeek-V4-Flash (Haiku tier). Each agent definition includes "why" explanations for less-capable subagent models. See README for model configuration.
+
+### Documentation
+
+- `README.md` — Full English README explaining why this fork exists, the zodiac philosophy, pain-point-driven development, and performance/cost analysis
+- `README.zh.md` — Complete Chinese translation with language switcher
+- `docs/athena/AGENTS.md` — Agent dispatch guide (Chinese)
+- `docs/athena/OVERVIEW.md` — Full agent catalog with dispatch rules + anti-patterns
+- `docs/athena/INSTALL.md` — Install / verify / update / uninstall instructions (Chinese)
+- All human-facing docs include machine-readable `## For Agents` sections
+
+### Design philosophy
+
+- **Pain-point-driven development.**
+- **Zodiac personality-first agent design.** Role grows from personality, not the reverse.
+- **Independent review at every gate.** Never self-review.
+- **Write it down or lose it.** Context is ephemeral; files are forever.
+- **Multi-model from the start.** Not an afterthought — the architecture is built around it.
+
+### Known gaps
+
+- Leo (frontend/UI specialist) and Gemini (idea generator) — planned but not yet implemented. No pressing need.
+- Aquarius — still thinking. No personality→role click yet.
+- macOS install not yet supported.
+- Writing-skills module from upstream removed; Joe uses his own `skill-creator-plus` globally.
+- No marketplace distribution yet — install via git clone only.
+
+### Credits
+
+Forked from [obra/superpowers](https://github.com/obra/superpowers) by Jesse Vincent at Prime Radiant. Grill-me interview style from [Matt Pocock](https://github.com/mattpocock). Specialized subagent naming inspired by [Oh-My-OpenCode](https://github.com/oh-my-opencode/oh-my-opencode). All errors and excesses are mine.
+
+---
+
+## Upstream release notes (historical)
+
+The following sections are preserved from upstream superpowers for reference. They describe changes to the upstream repo before this fork diverged. Not all of them apply to athena.
 
 ## v5.1.0 (2026-04-30)
 

@@ -86,7 +86,7 @@ bash uninstall.sh
 
 | 文件 | 改动 |
 |------|------|
-| `.claude-plugin/plugin.json` | name → athena-superpowers,version → 5.1.0-athena |
+| `.claude-plugin/plugin.json` | name → athena-superpowers,version → 0.1.0 |
 | `user-agents/*.md` + `user-agents/refs/` | 新增 9 个全局 agent(官方无此目录)+ 渐进式披露 refs。命名为 `user-agents/` 而非 `agents/`,防止 @skills-dir 插件自动发现导致 agent 重复注册 |
 | `install.sh` / `install.ps1` / `uninstall.sh` / `uninstall.ps1` / `tests/test-install.sh` | 新增:跨平台安装/卸载 + TDD 测试 |
 | `skills/subagent-driven-development/SKILL.md` | implementer/spec-reviewer/code-quality-reviewer → capricorn/scorpio/taurus;加 Aries Gate;删 Prompt Templates |
