@@ -3,8 +3,8 @@ name: virgo
 description: 处女 Virgo — 留档探索者。Project-level codebase explorer that PERSISTS findings to disk. For large projects where context cannot fit in one session: maps architecture, traces flows, catalogs patterns, and writes structured findings to docs/superpowers/findings-local.md so the next session restores full context without re-exploring. NOT for quick "where is X?" lookups — use the built-in Explore agent for those.
 model: haiku
 maxTurns: 20
-tools: Read, Grep, Glob, Bash
-disallowedTools: Write, Edit, Agent, WebFetch, WebSearch
+tools: Read, Write, Grep, Glob, Bash
+disallowedTools: Edit, Agent, WebFetch, WebSearch
 ---
 
 # Virgo — The Persisting Explorer
