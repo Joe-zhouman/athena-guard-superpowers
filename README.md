@@ -154,18 +154,37 @@ First, disable upstream Superpowers (both enabled = double hook injection, confl
 }
 ```
 
-Then:
+Then — **one-liner** (no clone needed first; the script asks where to clone, clones from GitHub, keeps it git-pullable, then installs):
+
+```powershell
+# Windows (PowerShell 5.1+) — fetch via jsDelivr, clone from GitHub
+powershell -NoProfile -ExecutionPolicy Bypass -c "iwr 'https://cdn.jsdelivr.net/gh/Joe-zhouman/athena-superpowers@master/get.ps1' | iex"
+```
 
 ```bash
-git clone git@github.com:Joe-zhouman/athena-guard-superpowers.git ~/athena-guard-superpowers
+# Linux / macOS
+bash -c "$(curl -fsSL https://cdn.jsdelivr.net/gh/Joe-zhouman/athena-superpowers@master/get.sh)"
+```
+
+**For Windows users new to the terminal:** the script walks you through it — you create a folder in File Explorer, copy its path from the address bar, paste it when prompted, and press Enter. Get the path wrong and it tells you why and asks again; it never proceeds on a bad path.
+
+The script:
+1. Asks you to pick (or create) a folder to keep the repo in — it stays there, git-pullable.
+2. Clones from GitHub into that folder (or `git pull`s if already there).
+3. Runs the repo's `install.ps1`/`install.sh`, which:
+   - Symlinks the repo into `~/.claude/skills/athena-superpowers/` — hooks and skills auto-load via `@skills-dir`
+   - Copies the 9 agents into `~/.claude/agents/` as user-level globals — plugin-level agents lose `permissionMode`/`mcpServers`; athena agents need those
+
+Re-run the same one-liner any time to **update** (git pull + reinstall). The clone is never deleted.
+
+**Manual** (if you prefer):
+
+```bash
+git clone https://github.com/Joe-zhouman/athena-guard-superpowers.git ~/athena-guard-superpowers
 cd ~/athena-guard-superpowers
 bash install.sh        # linux
 # .\install.ps1        # windows
 ```
-
-`install.sh` does two things:
-1. Symlinks the repo into `~/.claude/skills/athena-superpowers/` — hooks and skills auto-load via `@skills-dir`
-2. Copies the 9 agents into `~/.claude/agents/` as user-level globals — plugin-level agents lose `permissionMode`/`mcpServers`; athena agents need those
 
 Start a new session. See `docs/athena/INSTALL.md` for verification steps.
 
@@ -176,6 +195,7 @@ To uninstall:
 ```bash
 bash uninstall.sh      # linux
 # .\uninstall.ps1      # windows
+# (the clone in the folder you picked is yours to delete manually)
 ```
 
 ## The Workflow
