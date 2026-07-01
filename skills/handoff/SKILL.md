@@ -9,7 +9,7 @@ Write a handoff document summarising the current conversation so a fresh agent c
 
 Include a "suggested skills" section in the document, which suggests skills that the agent should invoke.
 
-Do not duplicate content already captured in other artifacts (PRDs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead.
+Do not duplicate content already captured on disk. Reference it by path instead of restating it. This includes the project's own artifacts — `docs/superpowers/glossary.md`, `findings-local.md`, `findings-external.md`, `specs/`, and any `plans/` — plus the usual PRDs, ADRs, issues, commits, and diffs. The handoff should hold only what's NOT already on disk: the current open question, what was decided in-conversation but not yet written down, the next concrete step, and which on-disk artifacts the next agent must read first. *Why: restating disk content in the handoff creates a second source of truth — when the file changes and the handoff doesn't, the next agent sees contradictory facts and trusts the stale one. Pointing at the path keeps a single source.*
 
 Redact any sensitive information, such as API keys, passwords, or personally identifiable information.
 
