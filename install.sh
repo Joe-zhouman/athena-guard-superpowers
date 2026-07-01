@@ -85,6 +85,23 @@ echo "[agents]  copied $agent_count agents -> $AGENTS_DIR"
 echo "[refs]    copied $ref_count refs -> $AGENTS_REFS_DIR"
 echo "          (user-level: global, no field restrictions)"
 
+# --- 3. global skills (installed to ~/.claude/skills/ individually, not inside plugin) ---
+GLOBAL_SKILLS_DIR="$REPO_ROOT/global-skills"
+SKILLS_INSTALL_DIR="$CLAUDE_HOME/skills"
+
+if [[ -d "$GLOBAL_SKILLS_DIR" ]]; then
+  global_skill_count=0
+  for skill_dir in "$GLOBAL_SKILLS_DIR"/*; do
+    [[ -d "$skill_dir" ]] || continue
+    skill_name="$(basename "$skill_dir")"
+    dest="$SKILLS_INSTALL_DIR/$skill_name"
+    mkdir -p "$dest"
+    cp "$skill_dir"/* "$dest/"
+    global_skill_count=$((global_skill_count + 1))
+  done
+  echo "[global-skills] copied $global_skill_count global skill(s) -> $SKILLS_INSTALL_DIR"
+fi
+
 echo
 echo "Done. To activate:"
 echo "  1. Start a NEW Claude Code session (hooks/skills load at session start)."
