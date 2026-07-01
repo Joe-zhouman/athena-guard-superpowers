@@ -122,11 +122,11 @@ These files are the project's memory across sessions. A question whose answer is
 
 **Any time you need external information — library docs, how a package works, API behavior, papers, best practices, current facts — dispatch `sagittarius` instead of calling `WebSearch` / `WebFetch` yourself.**
 
-Why: sagittarius has dedicated library-docs access (`mcp__doc`), multi-source cross-referencing with citations and confidence levels, and persists findings to `findings-external.md` so the research survives across sessions. Your own `WebSearch` is single-shot, uncited, and dies in chat.
+Why: sagittarius has dedicated library-docs access (`mcp__doc`), multi-source cross-referencing with citations and confidence levels, and delivers a structured findings block — you write it to `findings-external.md` so the research survives across sessions. Your own `WebSearch` is single-shot, uncited, and dies in chat.
 
-The main agent's job is to recognize the gap and write a precise research brief — not to do the hunting. Dispatch sagittarius with the question; let it return a cited summary + the path to `findings-external.md`.
+The main agent's job is to recognize the gap and write a precise research brief — not to do the hunting. Dispatch sagittarius with the question; it returns a cited summary + a structured findings block. Write the block to `findings-external.md`.
 
-Symmetric rule for local codebase exploration at project scale: dispatch `virgo` (writes `findings-local.md`). For a quick single lookup, use the built-in Explore agent instead — virgo is for mapping, not locating.
+Symmetric rule for local codebase exploration at project scale: dispatch `virgo` (delivers a findings block — write it to `findings-local.md`). For a quick single lookup, use the built-in Explore agent instead — virgo is for mapping, not locating.
 
 ## User Instructions
 

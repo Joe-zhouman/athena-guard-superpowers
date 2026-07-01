@@ -24,7 +24,7 @@ Every project goes through this process. A todo list, a single-function utility,
 You MUST create a task for each of these items and complete them in order:
 
 1. **Read the room** — read `docs/superpowers/glossary.md`, `findings-local.md`, `findings-external.md`, and any prior `specs/` if they exist. These reconstruct context from previous sessions. Skip files that don't exist yet.
-2. **Explore (dispatch virgo / sagittarius)** — based on what the task needs and what you already know, decide: dispatch virgo for local codebase mapping, sagittarius for external research, both in parallel for cross-domain projects, or neither if you already have enough context. They write to `findings-local.md` / `findings-external.md` respectively.
+2. **Explore (dispatch virgo / sagittarius)** — based on what the task needs and what you already know, decide: dispatch virgo for local codebase mapping, sagittarius for external research, both in parallel for cross-domain projects, or neither if you already have enough context. They return structured findings blocks — **you write them to** `findings-local.md` / `findings-external.md`. (They have no Write permission; delivering the block is their job, writing the file is yours.)
 3. **Offer visual companion** (if topic will involve visual questions) — this is its own message, not combined with a grill question. See the Visual Companion section below.
 4. **Grill the user** — relentless interview to sharpen the idea, one question at a time, each with a recommended answer. Resolve terminology into `glossary.md` as it crystallizes. See the Grill section below.
 5. **Propose 2-3 approaches** — with trade-offs and your recommendation
@@ -82,9 +82,9 @@ If the project is too large for a single spec, help the user decompose into sub-
 **Explore (dispatch virgo / sagittarius — your call):**
 
 Based on what the task needs and what you already know, decide:
-- **Local codebase unfamiliar or large** → dispatch **virgo** (writes `findings-local.md`)
-- **External library / API / best practice needed** → dispatch **sagittarius** (writes `findings-external.md`)
-- **Cross-domain large project** → dispatch **both in parallel** (they write separate files, no conflict)
+- **Local codebase unfamiliar or large** → dispatch **virgo** (delivers findings block — write it to `findings-local.md`)
+- **External library / API / best practice needed** → dispatch **sagittarius** (delivers findings block — write it to `findings-external.md`)
+- **Cross-domain large project** → dispatch **both in parallel** (they deliver separate blocks, no conflict — you write both)
 - **You already have enough context** → skip exploration, go straight to grilling
 
 Do NOT auto-dispatch both for every task. Virgo and sagittarius cost a round-trip each; only spend them when the gap is real.
@@ -92,11 +92,11 @@ Do NOT auto-dispatch both for every task. Virgo and sagittarius cost a round-tri
 ```
 Agent(subagent_type="virgo",
       description="Map <area> for <task>",
-      prompt="<What map do you need? e.g. 'Trace the auth flow: where login is handled, how sessions are persisted, what middleware checks them. Anchor every claim to file:line. Write to docs/superpowers/findings-local.md.'>")
+      prompt="<What map do you need? e.g. 'Trace the auth flow: where login is handled, how sessions are persisted, what middleware checks them. Anchor every claim to file:line. Deliver a structured findings block.'>")
 
 Agent(subagent_type="sagittarius",
       description="Research <library/topic>",
-      prompt="<What do you need to know? e.g. 'How does library X handle Y? Cite primary sources, signal confidence. Append to docs/superpowers/findings-external.md.'>")
+      prompt="<What do you need to know? e.g. 'How does library X handle Y? Cite primary sources, signal confidence. Deliver a structured findings block (with citations and confidence). If you found stale entries, include a corrections block.'>")
 ```
 
 When both are dispatched, do it in a single message with two `Agent` calls so they run concurrently.
