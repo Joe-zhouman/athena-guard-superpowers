@@ -23,7 +23,7 @@ Every project goes through this process. A todo list, a single-function utility,
 
 You MUST create a task for each of these items and complete them in order:
 
-1. **Read the room** — read `docs/superpowers/glossary.md`, `findings-local.md`, `findings-external.md`, and any prior `specs/` if they exist. These reconstruct context from previous sessions. Skip files that don't exist yet — but note that `glossary.md` doesn't exist yet: when a term crystallizes in the grill (step 4), you'll create it from the template (see "Glossary" below), not skip it forever.
+1. **Read the room** — read `docs/superpowers/glossary.md`, `findings-local.md`, `findings-external.md`, and any prior `specs/` if they exist. Also scan `docs/superpowers/plans/` for **in-progress** plans (ones with unchecked `- [ ]` steps) — those mean prior work stopped mid-execution and the new design should account for it, not duplicate it. A fully checked-out plan (`- [x]` throughout) is history; note it exists but don't study it as current state. These reconstruct context from previous sessions. Skip files that don't exist yet — but note that `glossary.md` doesn't exist yet: when a term crystallizes in the grill (step 4), you'll create it from the template (see "Glossary" below), not skip it forever.
 2. **Explore (dispatch virgo / sagittarius)** — based on what the task needs and what you already know, decide: dispatch virgo for local codebase mapping, sagittarius for external research, both in parallel for cross-domain projects, or neither if you already have enough context. They return structured findings blocks — **you write them to** `findings-local.md` / `findings-external.md`. (They have no Write permission; delivering the block is their job, writing the file is yours.)
 3. **Offer visual companion** (if topic will involve visual questions) — this is its own message, not combined with a grill question. See the Visual Companion section below.
 4. **Grill the user** — relentless interview to sharpen the idea, one question at a time, each with a recommended answer. Resolve terminology into `glossary.md` as it crystallizes. See the Grill section below.
@@ -70,6 +70,7 @@ Before doing anything else, read these files if they exist (skip silently if not
 - `docs/superpowers/findings-local.md` — virgo's prior local codebase maps
 - `docs/superpowers/findings-external.md` — sagittarius's prior external research
 - Any `docs/superpowers/specs/*.md` for prior work on the same topic
+- Any `docs/superpowers/plans/*.md` — check their checkbox state: a plan with unchecked `- [ ]` steps is in-progress work to continue, not re-plan; a fully `- [x]` plan is completed history, note it but don't treat it as current
 
 A fresh session with these files restored has the context of every prior session that wrote to them. Don't waste the user's questions re-deriving what's already on disk.
 
