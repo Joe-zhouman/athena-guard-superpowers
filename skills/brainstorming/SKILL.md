@@ -131,6 +131,8 @@ End the grill when every load-bearing decision has a resolved answer (either fro
 - Present options conversationally with your recommendation and reasoning
 - Lead with your recommended option and explain why
 
+**Prototyping to break a tie (use sparingly):** Sometimes two approaches hinge on a question that talk alone can't settle — "does this state machine actually feel right when you drive it?" or "what should this screen look like?". When a load-bearing decision is genuinely undecidable from conversation, invoke the `prototype` skill to build **throwaway** code that answers just that question. This is NOT starting implementation — the prototype is deleted (or its verdict absorbed) the moment the question is answered, and you return to the design conversation with the verdict in hand. *Why: a prototype is a cheap way to convert a vague "I think approach A feels right" into a tested "we drove it, A breaks at edge case X, so B" — but only reach for it when the design truly can't be decided by talking. Most design questions can be settled in conversation; over-prototyping is just early implementation wearing a costume, and triggers the same code-gravity the gate exists to prevent.* Fold the verdict into the design / glossary / an ADR note, then delete the prototype.
+
 **Presenting the design:**
 
 - Once you believe you understand what you're building, present the design

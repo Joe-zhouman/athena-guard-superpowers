@@ -1,6 +1,6 @@
 ---
 name: prototype
-description: Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like.
+description: Build THROWAWAY code to settle ONE design question that conversation alone can't — a state machine that needs driving to see if it feels right, a logic/edge-case interaction hard to reason about on paper, or a UI that needs concrete variants to react to. Use this whenever a design discussion stalls on "does this actually work?" or "what should it look like?" and the cheapest way forward is to run it for 10 minutes, NOT to start real implementation. The output is a verdict (absorbed into the design), then the code is deleted. Distinct from real implementation — no tests, no persistence, no polish.
 ---
 
 # Prototype
