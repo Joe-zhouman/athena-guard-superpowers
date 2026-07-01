@@ -145,7 +145,7 @@ Apply those two tests honestly. Most "let's parallelize this" combinations fail 
 |---------|----------|---------------|
 | N independent bugs in different subsystems | N × **cancer** | Each writes its own diagnosis file + edits its own scope. No shared state, no ordering. |
 | N independent new-feature tasks from a plan | N × **capricorn** | Each implements one plan task. Safe **iff** the tasks touch disjoint files (the plan should already ensure this). |
-| Map local code + research external library | **virgo** + **sagittarius** | Both read-only; write to separate files (`findings-local.md` vs `findings-external.md`). No ordering. |
+| Map local code + research external library | **virgo** + **sagittarius** | Both read-only; deliver structured findings blocks (main agent writes `findings-local.md` and `findings-external.md`). No ordering. |
 | Adversarial testing on N subsystems | N × **aries** | Each breaks its own subsystem; writes its own review file. |
 | Polish N independent docs | N × **pisces** | Each edits its own doc. |
 
