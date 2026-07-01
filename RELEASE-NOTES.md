@@ -65,7 +65,7 @@ Designed for GLM-5.2 (orchestrator, Opus/Fable tier) + DeepSeek-V4-Pro (Sonnet t
 
 ### Known gaps
 
-- Leo (frontend/UI specialist) and Gemini (product manager / requirements wrangler) — planned but not yet implemented. No pressing need.
+- Leo (frontend/UI specialist) and Gemini (wild-card idea guy, Blizzard designer energy) — planned but not yet implemented. No pressing need.
 - Aquarius — still thinking. No personality→role click yet.
 - macOS install not yet supported.
 - Writing-skills module from upstream removed; Joe uses his own `skill-creator-plus` globally.
