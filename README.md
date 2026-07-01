@@ -318,9 +318,12 @@ A typical feature from brainstorm to merge with 3 implementation tasks:
 | Brainstorming | brainstorming SKILL.md (4,300 tokens), virgo/sagittarius agent defs (~4,400 tokens if both dispatched) | ~4,300–8,700 |
 | Writing spec | writing-spec SKILL.md (3,300 tokens), libra agent def (1,700 tokens) | ~5,000 |
 | Writing plan | writing-plans SKILL.md (2,100 tokens), libra again (1,700 tokens) | ~3,800 |
-| Per task ×3 | capricorn (2,400) + scorpio (1,700) + taurus (1,600) + skill overhead | ~5,700 per task |
+| Per task ×3 | capricorn (2,400) + your inline check (free) | ~2,400 per task |
+| Final review (once) | scorpio (1,700) + taurus (1,600) + skill overhead | ~3,800 |
 | File persistence | Reading findings, glossary, prior specs; writing reviews and progress | ~3,000–5,000 |
-| **Approximate total** | | **~42,000–50,000 tokens** |
+| **Approximate total** | | **~35,000–42,000 tokens** |
+
+(Before the review-model change this was ~42–50K. Moving scorpio+taurus from per-task to once-at-end saves ~7–8K tokens for a 3-task batch.)
 
 This is just the *plugin overhead*. Your actual code context (source files, test output, git diffs) adds on top.
 

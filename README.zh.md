@@ -175,7 +175,7 @@ bash uninstall.sh      # linux
 1. **brainstorming**——任何创造性工作前激活。从磁盘读取之前的研究结果，可选派 virgo/sagittarius 获取上下文，然后盘问你（一次一个问题、推荐答案、苏格拉底式 interview）。呈现设计供审批。委托给 writing-spec。
 2. **writing-spec**——将设计形式化为痛点驱动的 spec。问题 → 设计决策理由 → 实现说明 → 验收条件。派 libra 审查。用户审批。交给 writing-plans。
 3. **writing-plans**——把 spec 拆成小块任务（每个 2-5 分钟），带精确文件路径和验证步骤。libra 审查。交给执行。
-4. **subagent-driven-development**——每个任务一个全新的 `capricorn` 子代理，后面跟着 `scorpio`（规格符合性）然后 `taurus`（代码质量）。快速迭代，每个任务隔离上下文。
+4. **subagent-driven-development**——每个任务一个全新的 `capricorn` 子代理，你的内联检查保持节奏。全部完成后派一次 `scorpio`（规格符合性）→ 一次 `taurus`（代码质量）。
 5. **test-driven-development**——RED-GREEN-REFACTOR 在实现层面强制执行。写失败测试、看到它失败、写最小代码、看到它通过、提交。
 6. **verification-before-completion**——先有证据再断言。跑测试，看到它们通过，然后声称完成。
 
@@ -312,9 +312,12 @@ SessionStart hook 强制在每次 session 开始时读取 `using-superpowers`（
 | Brainstorming | brainstorming SKILL.md（4,300 tokens）、virgo/sagittarius 代理定义（如派发约 4,400 tokens） | ~4,300–8,700 |
 | 写 spec | writing-spec SKILL.md（3,300 tokens）、libra 代理定义（1,700 tokens） | ~5,000 |
 | 写 plan | writing-plans SKILL.md（2,100 tokens）、libra 再次（1,700 tokens） | ~3,800 |
-| 每个任务 ×3 | capricorn（2,400）+ scorpio（1,700）+ taurus（1,600）+ skill overhead | 每个约 5,700 |
+| 每个任务 ×3 | capricorn（2,400）+ 你的内联检查（免费） | 每个约 2,400 |
+| 最终审查（一次） | scorpio（1,700）+ taurus（1,600）+ skill overhead | ~3,800 |
 | 文件读写 | 读取 findings、glossary、已有 spec；写入 review 和 progress | ~3,000–5,000 |
-| **近似合计** | | **~42,000–50,000 tokens** |
+| **近似合计** | | **~35,000–42,000 tokens** |
+
+（审查模型改动之前是 ~42–50K。scorpio+taurus 从每任务改为一轮一次，3 任务的批次节省约 7–8K tokens。）
 
 这还只是插件的开销。实际代码上下文（源文件、测试输出、git diff）叠加在上面。
 

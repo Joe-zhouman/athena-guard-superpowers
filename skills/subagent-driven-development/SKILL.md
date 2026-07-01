@@ -5,21 +5,21 @@ description: Use when executing implementation plans with independent tasks in t
 
 # Subagent-Driven Development
 
-Execute plan by dispatching fresh subagent per task, with two-stage review after each: spec compliance review first, then code quality review.
+Execute plan by dispatching one **capricorn** subagent per task. You (the main agent) do a quick inline review after each task. After ALL tasks are done, dispatch **scorpio** then **taurus** once against the full diff — one spec-compliance review, one code-quality review, not one per task.
 
-**Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
+**Why this order matters:** per-task formal review (scorpio + taurus × N) costs 2 expensive subagent dispatches per task. They're both reviewers — they need scorpio=fable and taurus=sonnet just to do their job, which means ~3,300 tokens of agent definitions alone per task, plus the actual model inference. For 3 tasks that's ~10,000 tokens of overhead just on review agent context-load. And the reviews aren't even better — a spec-compliance issue that spans two tasks is invisible when you review each in isolation.
 
-**Core principle:** Fresh subagent per task + two-stage review (spec then quality) = high quality, fast iteration
+The better trade: you do the quick per-task check (you have context, you read the code, you know what changed), and formal review happens once against the aggregate. Scorpio sees the whole picture. Taurus critiques the whole codebase. Fewer dispatches, better reviews, less cost.
 
 **Athena wiring:** The four roles below are filled by dedicated single-purpose agents (not general-purpose with inline prompts):
-- **capricorn** — the implementer (executes one task, TDD, self-reviews, commits)
-- **scorpio** — the spec-compliance reviewer (verifies code matches spec, does NOT trust the implementer's report)
-- **taurus** — the code-quality reviewer (runs only AFTER scorpio passes)
-- **aries** — the adversarial tester (runs AFTER taurus passes, **only when the task touches a high-risk surface** — see Aries Gate below)
+- **capricorn** — the implementer (executes one task, TDD, self-reviews, commits) — dispatched per task
+- **scorpio** — the spec-compliance reviewer (verifies full implementation against spec) — dispatched ONCE after all tasks
+- **taurus** — the code-quality reviewer (runs only AFTER scorpio passes) — dispatched ONCE after all tasks
+- **aries** — the adversarial tester (dispatched ONCE after taurus, **only when the implementation touches a high-risk surface** — see Aries Gate below)
 
 Each agent's discipline is baked into its own definition — you dispatch them bare, no prompt template needed.
 
-**Why these are *different* agents, not one agent wearing hats:** a reviewer who shares context with the implementer has just as much invested in the implementation being right — they wrote it, or they're about to, or it's polluting their window. The bias isn't dishonesty; it's that the same context that produced the work can't cleanly judge it. Splitting implementer / spec-reviewer / quality-reviewer into separate fresh contexts means each one sees the work without the residue of having produced it. scorpio isn't smarter than capricorn about the code — it's *independent* of capricorn about the code, which is the one thing capricorn can't be about its own work.
+**Why scorpio and taurus are separate agents despite reviewing only once:** they're not just reviewers — they're checks on *you*. After hours of coordinating capricorns, you have as much context invested as any implementer. Scorpio reads the code cold, from the spec, without knowing what you think it does. Taurus reads the diff without knowing which parts you're proud of and which you rushed. You can't replicate that — your inline per-task check is good enough to keep going, but the final review needs fresh eyes.
 
 **Continuous execution:** Do not pause to check in with your human partner between tasks. Execute all tasks from the plan without stopping. The only reasons to stop are: BLOCKED status you cannot resolve, ambiguity that genuinely prevents progress, or all tasks complete. "Should I continue?" prompts and progress summaries waste their time — they asked you to execute the plan, so execute it.
 
@@ -58,64 +58,94 @@ digraph process {
     rankdir=TB;
 
     subgraph cluster_per_task {
-        label="Per Task";
-        "Dispatch capricorn (implementer)" [shape=box];
+        label="Per Task (repeat for each)";
+        "Dispatch capricorn" [shape=box];
         "capricorn asks questions?" [shape=diamond];
-        "Answer questions, provide context" [shape=box];
-        "capricorn implements, tests, commits, self-reviews" [shape=box];
-        "Dispatch scorpio (spec-compliance reviewer)" [shape=box];
-        "scorpio confirms code matches spec?" [shape=diamond];
-        "capricorn fixes spec gaps" [shape=box];
-        "Dispatch taurus (code-quality reviewer)" [shape=box];
-        "taurus approves?" [shape=diamond];
-        "capricorn fixes quality issues" [shape=box];
-        "Task touches high-risk surface?\n(see Aries Gate below)" [shape=diamond];
-        "Dispatch aries (adversarial tester)" [shape=box];
-        "aries verdict?" [shape=diamond];
-        "capricorn fixes breakage" [shape=box];
-        "Mark task complete in TodoWrite" [shape=box];
+        "Answer and re-dispatch" [shape=box];
+        "capricorn implements, tests, commits" [shape=box];
+        "Your inline check — quick sanity pass" [shape=box];
+        "Issues?" [shape=diamond];
+        "capricorn fixes inline issues" [shape=box];
+        "Mark task complete" [shape=box];
     }
 
-    "Read plan, extract all tasks with full text, note context, create TodoWrite" [shape=box];
-    "More tasks remain?" [shape=diamond];
-    "Dispatch taurus for final whole-implementation review" [shape=box];
-    "Use superpowers:finishing-a-development-branch" [shape=box style=filled fillcolor=lightgreen];
+    subgraph cluster_final_review {
+        label="Final Review (once, after all tasks)";
+        "Dispatch scorpio — spec compliance\n(against full spec + full diff)" [shape=box];
+        "scorpio approves?" [shape=diamond];
+        "capricorn fixes spec gaps" [shape=box style=filled fillcolor=lightyellow];
+        "Dispatch taurus — code quality\n(against full diff)" [shape=box];
+        "taurus approves?" [shape=diamond];
+        "capricorn fixes quality issues" [shape=box style=filled fillcolor=lightyellow];
+        "Aries Gate fires?" [shape=diamond];
+        "Dispatch aries — adversarial test" [shape=box];
+        "aries: BREAKABLE?" [shape=diamond];
+        "capricorn fixes breakage" [shape=box style=filled fillcolor=lightyellow];
+    }
 
-    "Read plan, extract all tasks with full text, note context, create TodoWrite" -> "Dispatch capricorn (implementer)";
-    "Dispatch capricorn (implementer)" -> "capricorn asks questions?";
-    "capricorn asks questions?" -> "Answer questions, provide context" [label="yes"];
-    "Answer questions, provide context" -> "Dispatch capricorn (implementer)";
-    "capricorn asks questions?" -> "capricorn implements, tests, commits, self-reviews" [label="no"];
-    "capricorn implements, tests, commits, self-reviews" -> "Dispatch scorpio (spec-compliance reviewer)";
-    "Dispatch scorpio (spec-compliance reviewer)" -> "scorpio confirms code matches spec?";
-    "scorpio confirms code matches spec?" -> "capricorn fixes spec gaps" [label="no"];
-    "capricorn fixes spec gaps" -> "Dispatch scorpio (spec-compliance reviewer)" [label="re-review"];
-    "scorpio confirms code matches spec?" -> "Dispatch taurus (code-quality reviewer)" [label="yes"];
-    "Dispatch taurus (code-quality reviewer)" -> "taurus approves?";
+    "Read plan, extract tasks, create TodoWrite" [shape=box];
+    "More tasks?" [shape=diamond];
+    "Use finishing-a-development-branch" [shape=doublecircle];
+
+    "Read plan, extract tasks, create TodoWrite" -> "Dispatch capricorn";
+    "Dispatch capricorn" -> "capricorn asks questions?";
+    "capricorn asks questions?" -> "Answer and re-dispatch" [label="yes"];
+    "Answer and re-dispatch" -> "Dispatch capricorn";
+    "capricorn asks questions?" -> "capricorn implements, tests, commits" [label="no"];
+    "capricorn implements, tests, commits" -> "Your inline check — quick sanity pass";
+    "Your inline check — quick sanity pass" -> "Issues?";
+    "Issues?" -> "capricorn fixes inline issues" [label="yes"];
+    "capricorn fixes inline issues" -> "Your inline check — quick sanity pass";
+    "Issues?" -> "Mark task complete" [label="no"];
+    "Mark task complete" -> "More tasks?";
+    "More tasks?" -> "Dispatch capricorn" [label="yes"];
+    "More tasks?" -> "Dispatch scorpio — spec compliance\n(against full spec + full diff)" [label="no"];
+    "Dispatch scorpio — spec compliance\n(against full spec + full diff)" -> "scorpio approves?";
+    "scorpio approves?" -> "capricorn fixes spec gaps" [label="no"];
+    "capricorn fixes spec gaps" -> "Dispatch scorpio — spec compliance\n(against full spec + full diff)" [label="re-review"];
+    "scorpio approves?" -> "Dispatch taurus — code quality\n(against full diff)" [label="yes"];
+    "Dispatch taurus — code quality\n(against full diff)" -> "taurus approves?";
     "taurus approves?" -> "capricorn fixes quality issues" [label="no"];
-    "capricorn fixes quality issues" -> "Dispatch taurus (code-quality reviewer)" [label="re-review"];
-    "taurus approves?" -> "Task touches high-risk surface?\n(see Aries Gate below)" [label="yes"];
-    "Task touches high-risk surface?\n(see Aries Gate below)" -> "Dispatch aries (adversarial tester)" [label="yes"];
-    "Task touches high-risk surface?\n(see Aries Gate below)" -> "Mark task complete in TodoWrite" [label="no"];
-    "Dispatch aries (adversarial tester)" -> "aries verdict?";
-    "aries verdict?" -> "capricorn fixes breakage" [label="BREAKABLE"];
-    "capricorn fixes breakage" -> "Dispatch aries (adversarial tester)" [label="re-test"];
-    "aries verdict?" -> "Mark task complete in TodoWrite" [label="SOLID"];
-    "Mark task complete in TodoWrite" -> "More tasks remain?";
-    "More tasks remain?" -> "Dispatch capricorn (implementer)" [label="yes"];
-    "More tasks remain?" -> "Dispatch taurus for final whole-implementation review" [label="no"];
-    "Dispatch taurus for final whole-implementation review" -> "Use superpowers:finishing-a-development-branch";
+    "capricorn fixes quality issues" -> "Dispatch taurus — code quality\n(against full diff)" [label="re-review"];
+    "taurus approves?" -> "Aries Gate fires?" [label="yes"];
+    "Aries Gate fires?" -> "Dispatch aries — adversarial test" [label="yes"];
+    "Aries Gate fires?" -> "Use finishing-a-development-branch" [label="no"];
+    "Dispatch aries — adversarial test" -> "aries: BREAKABLE?";
+    "aries: BREAKABLE?" -> "capricorn fixes breakage" [label="yes"];
+    "capricorn fixes breakage" -> "Dispatch aries — adversarial test" [label="re-test"];
+    "aries: BREAKABLE?" -> "Use finishing-a-development-branch" [label="no"];
 }
 ```
+
+### Your inline per-task check
+
+After capricorn finishes each task, you do a quick sanity pass before marking it complete. This is NOT a full review — it's a cheap spot-check:
+
+- Did capricorn actually do what the task says? (read the commit diff)
+- Are tests passing?
+- Does the change look reasonable at a glance?
+
+If something's off, tell capricorn what to fix and re-check. If it looks good, mark complete and move on. **Do not dispatch scorpio or taurus here.** That comes at the end.
+
+**Why you and not a fresh subagent:** you've been reading capricorn's output between tasks. You know the plan. You have the full context. A quick sanity check costs you one `git diff` and 30 seconds. Dispatching scorpio per-task costs a fable round-trip and fresh context load — for a check you could do better and cheaper inline.
+
+### Final review: one scorpio + one taurus for the whole batch
+
+After ALL tasks are complete, dispatch scorpio once against the full spec and the full cumulative diff. This is better than per-task review — scorpio sees the whole picture and catches cross-task issues (Task 2 changed behavior Task 1 assumed, Task 3 added something Task 1 should have).
+
+If scorpio approves, dispatch taurus once against the full diff.
 
 ### How to dispatch each agent
 
 Dispatch bare — no prompt template. The agent's own definition carries the discipline. Pass only task-specific data:
 
+**Per-task:**
 - **capricorn**: `Agent(subagent_type="capricorn", description="Implement Task N: <name>", prompt="<full task text from plan>\n\n## Context\n<where it fits, dependencies>")`
-- **scorpio**: `Agent(subagent_type="scorpio", description="Spec review Task N", prompt="Spec:\n<full task text>\n\nImplementer claims:\n<capricorn's report>\n\nGit range: BASE <sha> HEAD <sha>")`
-- **taurus**: `Agent(subagent_type="taurus", description="Code quality review Task N", prompt="BASE <sha> HEAD <sha>")` — taurus reads the diff itself
-- **aries** (only if Aries Gate fires): `Agent(subagent_type="aries", description="Adversarial test Task N: <name>", prompt="Target: <what was built, where it lives>.\nRisk surface I am worried about: <which of the 5 high-risk categories apply>.\nGit range: BASE <sha> HEAD <sha>. Write report to docs/superpowers/reviews/<task>-adversarial.md.")`
+
+**After all tasks:**
+- **scorpio**: `Agent(subagent_type="scorpio", description="Spec compliance review: all tasks", prompt="Spec:\n<full spec>\n\nPlan executed:\n<full plan>\n\nGit range: BASE <sha> HEAD <sha>\n\nReview the full diff against the full spec. Flag any spec gap, missed requirement, or extra behavior — across all tasks.")`
+- **taurus** (only if scorpio approves): `Agent(subagent_type="taurus", description="Code quality review: full implementation", prompt="BASE <sha> HEAD <sha>")` — taurus reads the diff itself
+- **aries** (only if Aries Gate fires): `Agent(subagent_type="aries", description="Adversarial test: <what changed>", prompt="Target: <implementation summary, where it lives>.\nRisk surfaces I am worried about: <which of the 5 high-risk categories apply>.\nGit range: BASE <sha> HEAD <sha>.\nWrite report to docs/superpowers/reviews/<batch>-adversarial.md.")`
 
 ### Aries Gate — when to dispatch aries
 
@@ -137,7 +167,9 @@ If the task touches any of these, dispatch aries and tell it which surfaces you 
 
 ## Model Selection
 
-The three agents come with their own model tier baked in (capricorn=fable, scorpio=fable, taurus=sonnet). You do not pick models per dispatch.
+Each agent comes with its own model tier baked in (capricorn=fable, scorpio=fable, taurus=sonnet, aries=sonnet). You do not pick models per dispatch.
+
+The per-task check (your inline sanity pass) costs zero extra dispatches. This is the point: 3 tasks × (1 capricorn) + 1 scorpio + 1 taurus = 5 dispatches total, instead of 3 × (1 capricorn + 1 scorpio + 1 taurus) = 9.
 
 **Task-size signals still matter** — they tell you whether to break a task down before handing it to capricorn:
 - Touches 1-2 files with a complete spec → fine as one capricorn task
@@ -168,12 +200,11 @@ capricorn reports one of four statuses. Handle each appropriately:
 You: I'm using Subagent-Driven Development to execute this plan.
 
 [Read plan file once: docs/superpowers/plans/feature-plan.md]
-[Extract all 5 tasks with full text and context]
+[Extract all 3 tasks with full text and context]
 [Create TodoWrite with all tasks]
 
-Task 1: Hook installation script
+--- Task 1: Add install-hook command ---
 
-[Get Task 1 text and context (already extracted)]
 [Dispatch capricorn with full task text + context]
 
 capricorn: "Before I begin - should the hook be installed at user or system level?"
@@ -187,53 +218,48 @@ capricorn: "Got it. Implementing now..."
   - Self-review: Found I missed --force flag, added it
   - Committed
 
-[Dispatch scorpio (spec-compliance reviewer)]
-scorpio: ✅ Spec compliant - all requirements met, nothing extra
+[Your inline check: git diff looks right, tests pass, mark complete]
 
-[Get git SHAs, dispatch taurus (code-quality reviewer)]
-taurus: Strengths: Good test coverage, clean. Issues: None. Approved.
+--- Task 2: Recovery modes ---
 
-[Mark Task 1 complete]
-
-Task 2: Recovery modes
-
-[Get Task 2 text and context (already extracted)]
 [Dispatch capricorn with full task text + context]
+capricorn: [No questions, proceeds, commits]
 
-capricorn: [No questions, proceeds]
-capricorn:
-  - Added verify/repair modes
-  - 8/8 tests passing
-  - Self-review: All good
-  - Committed
+[Your inline check: looks reasonable. One issue — missing progress reporting.]
+[capricorn fixes, re-checks, good. Mark complete.]
 
-[Dispatch scorpio]
+--- Task 3: Config validation ---
+
+[Dispatch capricorn]
+capricorn: [Implements, commits]
+[Your inline check: clean. Mark complete.]
+
+--- Final review ---
+
+All 3 tasks done. Now the real review.
+
+[Dispatch scorpio — spec compliance, full diff against full spec]
 scorpio: ❌ Issues:
-  - Missing: Progress reporting (spec says "report every 100 items")
-  - Extra: Added --json flag (not requested)
+  - Task 2 implements recovery but spec says "report every 100 items" — Task 2 didn't do this
+  - Task 3 validates server config but spec also requires client config validation
+  - No extra/unwanted behavior detected
 
-[capricorn fixes issues]
-capricorn: Removed --json flag, added progress reporting
+[capricorn fixes both]
+[scorpio re-review]
+scorpio: ✅ Full spec compliant
 
-[scorpio reviews again]
-scorpio: ✅ Spec compliant now
-
-[Dispatch taurus]
-taurus: Strengths: Solid. Issues (Important): Magic number (100)
+[Dispatch taurus — code quality, full diff]
+taurus: Strengths: Good coverage, clean interfaces between modules.
+        Issues (Important): PROGRESS_INTERVAL used as magic number in Task 2
+        but not in Task 3's config polling — inconsistency.
 
 [capricorn fixes]
-capricorn: Extracted PROGRESS_INTERVAL constant
-
-[taurus reviews again]
+[taurus re-review]
 taurus: ✅ Approved
 
-[Mark Task 2 complete]
+[Task touches nothing on Aries Gate surfaces — skip aries]
 
-...
-
-[After all tasks]
-[Dispatch taurus for final whole-implementation review]
-taurus: All requirements met, ready to merge
+[Mark all tasks verified, dispatch finishing-a-development-branch]
 
 Done!
 ```
@@ -258,23 +284,22 @@ Done!
 - Questions surfaced before work begins (not after)
 
 **Quality gates:**
-- Self-review catches issues before handoff
-- Two-stage review: spec compliance, then code quality
-- Review loops ensure fixes actually work
-- Spec compliance prevents over/under-building
-- Code quality ensures implementation is well-built
+- Your inline per-task check catches obvious issues immediately (free — you're already in context)
+- One spec-compliance review (scorpio, fable) against the full cumulative diff — catches cross-task issues invisible to per-task review
+- One code-quality review (taurus, sonnet) against the full diff, only after spec passes
+- One adversarial test (aries, sonnet) only if the Aries Gate fires
 
-**Cost:**
-- More subagent invocations (implementer + 2 reviewers per task)
-- Controller does more prep work (extracting all tasks upfront)
-- Review loops add iterations
-- But catches issues early (cheaper than debugging later)
+**Cost (per batch, 3 tasks):**
+- 3 capricorn dispatches (fable) + 1 scorpio (fable) + 1 taurus (sonnet) = 5 dispatches
+- Old model: 3 capricorn + 3 scorpio + 3 taurus = 9 dispatches
+- ~40% fewer review dispatches, zero quality loss (aggregate review is strictly better than per-task)
 
 ## Red Flags
 
 **Never:**
 - Start implementation on main/master branch without explicit user consent
-- Skip reviews (spec compliance OR code quality)
+- **Skip the final scorpio + taurus review** — your inline check is NOT a substitute; it's a sanity pass to keep momentum. Formal review still happens at the end.
+- **Do scorpio/taurus per-task** — wasted tokens, worse review (cross-task issues invisible). Once at the end is cheaper AND better.
 - Proceed with unfixed issues
 - Dispatch multiple implementation subagents in parallel (conflicts) — *why: two implementers editing the same working tree race on files; whoever writes last wins silently, and the other's changes vanish or corrupt. The isolation is the point of subagents, but it only holds one editor at a time per tree.*
 - Make subagent read plan file (provide full text instead) — *why: a Read of the plan pulls the whole plan into the subagent's context, including every other task it isn't doing, diluting focus and letting it "helpfully" implement adjacent work. Passing only its task's text scopes its world to exactly its job.*
@@ -282,10 +307,9 @@ Done!
 - Ignore subagent questions (answer before letting them proceed)
 - Accept "close enough" on spec compliance (spec reviewer found issues = not done)
 - Skip review loops (reviewer found issues = implementer fixes = review again)
-- Let implementer self-review replace actual review (both are needed)
+- Let capricorn's self-review replace your inline check (do both — yours is the sanity gate, capricorn's is the discipline)
 - **Start code quality review before spec compliance is ✅** (wrong order) — *why: taurus reviewing code that doesn't meet spec wastes a review — the code might be well-written but implementing the wrong thing, and quality feedback on wrong behavior is throwaway work. Confirm the code does the right thing (scorpio) before judging whether it does it well (taurus).*
-- Move to next task while either review has open issues
-- **Skip aries when the Aries Gate fires** — high-risk surface tasks must be adversarially tested, not just code-reviewed
+- **Skip aries when the Aries Gate fires** — high-risk surface tasks must be adversarially tested
 - **Auto-dispatch aries for low-risk tasks** — don't waste a sonnet round-trip on pure refactor or doc-only changes; only fire when the gate says so
 - **Skip aries on changes to `skills/`, `.claude/agents/`, `hooks/`, or MCP configs** — surface 5 is mandatory, these shape every future session
 
