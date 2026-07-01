@@ -82,7 +82,16 @@ The 6 prompt-template files were deleted. Each agent IS its own personality and 
 | **aries** | 白羊 | Aggressive, impulsive, loves destruction → **Adversarial tester**: boundary values, concurrency chaos, input terrorism |
 | **pisces** | 双鱼 | Sensitive to texture, can't stand things that sound wrong → **Text polisher**: de-AI-ification, human-sounding prose |
 
-**Missing seats:** Gemini (双子), Leo (狮子), Aquarius (水瓶). I haven't found roles for them that are both distinct from the existing nine and genuinely necessary to the workflow. If a need emerges, the personality will tell me which sign fits.
+**Planned but not yet implemented:**
+
+| Guardian | Zodiac | Personality → Role | Status |
+|----------|--------|-------------------|--------|
+| **leo** | 狮子 | Performer, showman, commands attention → **Frontend / UI specialist**: layouts, animations, visual polish — the part of development that faces the audience | No pressing need yet, but the personality fit is obvious |
+| **gemini** | 双子 | Mercurial, restless, ideas collide and mutate → **Idea generator / brainstorm sparring partner**: throws out angles you didn't consider, pivots mid-sentence, keeps the design conversation from settling too early | Same — I don't have a use case that needs this yet |
+
+**Aquarius (水瓶)** — still thinking. No personality→role click yet.
+
+The roster isn't capped at 12. That's the Gold Saints. *Saint Seiya* has Bronze Saints, Silver Saints, and warriors from entirely different pantheons who show up three arcs later. Same principle here: if a workflow need emerges and I can feel which personality would own it naturally, the seat gets added. Twelve is where the archetypes start, not where they end.
 
 ### libra replaces Self-Review
 
