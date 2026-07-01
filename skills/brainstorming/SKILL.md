@@ -29,10 +29,7 @@ You MUST create a task for each of these items and complete them in order:
 4. **Grill the user** — relentless interview to sharpen the idea, one question at a time, each with a recommended answer. Resolve terminology into `glossary.md` as it crystallizes. See the Grill section below.
 5. **Propose 2-3 approaches** — with trade-offs and your recommendation
 6. **Present design** — in sections scaled to their complexity, get user approval after each section
-7. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
-8. **Spec review (dispatch libra)** — independent review for blockers (placeholders, contradictions, ambiguity, scope creep)
-9. **User reviews written spec** — ask user to review the spec file before proceeding
-10. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+7. **Write spec (invoke writing-spec)** — formalize the approved design into a problem-driven spec document. writing-spec handles the spec format, libra review, user review gate, and handoff to writing-plans.
 
 ## Process Flow
 
@@ -46,10 +43,7 @@ digraph brainstorming {
     "Propose 2-3 approaches" [shape=box];
     "Present design sections" [shape=box];
     "User approves design?" [shape=diamond];
-    "Write design doc" [shape=box];
-    "Dispatch libra\n(reads spec from disk)" [shape=box];
-    "User reviews spec?" [shape=diamond];
-    "Invoke writing-plans skill" [shape=doublecircle];
+    "Invoke writing-spec skill\n(spec libra user plans)" [shape=doublecircle];
 
     "Read the room\n(glossary, findings, specs)" -> "Dispatch virgo / sagittarius?\n(based on task + what you know)";
     "Dispatch virgo / sagittarius?\n(based on task + what you know)" -> "Visual questions ahead?" [label="virgo and/or\nsagittarius return"];
@@ -61,16 +55,11 @@ digraph brainstorming {
     "Propose 2-3 approaches" -> "Present design sections";
     "Present design sections" -> "User approves design?";
     "User approves design?" -> "Present design sections" [label="no, revise"];
-    "User approves design?" -> "Write design doc" [label="yes"];
-    "Write design doc" -> "Dispatch libra\n(reads spec from disk)";
-    "Dispatch libra\n(reads spec from disk)" -> "User reviews spec?" [label="no blockers"];
-    "Dispatch libra\n(reads spec from disk)" -> "Write design doc" [label="blockers\n→ fix → re-dispatch"];
-    "User reviews spec?" -> "Write design doc" [label="changes requested"];
-    "User reviews spec?" -> "Invoke writing-plans skill" [label="approved"];
+    "User approves design?" -> "Invoke writing-spec skill\n(spec libra user plans)" [label="yes"];
 }
 ```
 
-**The terminal state is invoking writing-plans.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. The ONLY skill you invoke after brainstorming is writing-plans.
+**The terminal state is invoking writing-spec.** Do NOT invoke writing-plans or any implementation skill directly. The ONLY skill you invoke after brainstorming is writing-spec (which then owns the spec → review → plan chain).
 
 ## The Process
 
@@ -164,58 +153,15 @@ End the grill when every load-bearing decision has a resolved answer (either fro
 
 ## After the Design
 
-**Documentation:**
-
-- Write the validated design (spec) to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
-  - (User preferences for spec location override this default)
-- **Use the spec-writer format** (problem-driven). Structure:
-  ```
-  # <Capability Name>
-  Brief: one sentence describing what this is.
-
-  ## Problem
-  <!-- What is the current pain? What happens if not solved? -->
-  <!-- If you can't write this section, stop — there's no justification for the spec. -->
-
-  ## Design Rationale
-  <!-- Why this design? What alternatives were considered? Must explain WHY, not just WHAT. -->
-
-  ## Implementation Notes
-  <!-- OPTIONAL. Design-phase fragments worth keeping. Not a full plan. -->
-
-  ## Acceptance
-  <!-- Verifiable checkpoints. How do we know this is done? -->
-  ```
-  Lead with the interface (signatures, schemas). Separate data structures from behavioral rules.
-- Use elements-of-style:writing-clearly-and-concisely skill if available
-- Commit the design document to git
-
-**Spec Review (dispatch libra):**
-You wrote this spec — you are not the best reviewer of it. Dispatch **libra** for an independent read. libra checks only for blocking gaps (placeholders, contradictions, ambiguity that would cause building the wrong thing, scope creep); its default is APPROVE.
+Once the user approves the design, invoke the **writing-spec** skill to formalize it:
 
 ```
-Agent(subagent_type="libra",
-      description="Review spec: <filename>",
-      prompt="Review the spec at docs/superpowers/specs/<filename>.md. Flag only blockers — placeholders/TBDs, internal contradictions, requirements ambiguous enough to build the wrong thing, or scope covering multiple independent subsystems.")
+Skill("athena-superpowers:writing-spec")
 ```
 
-libra writes its verdict to `docs/superpowers/reviews/<spec-name>-spec-review.md`. Read it.
+writing-spec handles everything downstream: writing the problem-driven spec document, dispatching libra for independent review, the user review gate, and the handoff to writing-plans.
 
-**If libra finds blockers:** fix the spec, then re-dispatch libra (it re-reads from disk — fix the file, don't summarize).
-
-**If libra approves:** proceed to the User Review Gate.
-
-**User Review Gate:**
-After the spec review loop passes, ask the user to review the written spec before proceeding:
-
-> "Spec written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan."
-
-Wait for the user's response. If they request changes, make them and re-dispatch libra to re-review the updated spec. Only proceed once the user approves.
-
-**Implementation:**
-
-- Invoke the writing-plans skill to create a detailed implementation plan
-- Do NOT invoke any other skill. writing-plans is the next step.
+Do NOT write the spec inline. Do NOT dispatch libra yourself. Do NOT invoke writing-plans directly. Delegate to writing-spec — it owns the spec → review → plan chain.
 
 ## Key Principles
 

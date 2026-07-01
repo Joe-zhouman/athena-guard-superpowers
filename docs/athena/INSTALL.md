@@ -87,7 +87,7 @@ bash uninstall.sh
 | 文件 | 改动 |
 |------|------|
 | `.claude-plugin/plugin.json` | name → athena-superpowers,version → 5.1.0-athena |
-| `agents/*.md` + `agents/refs/` | 新增 9 个全局 agent(官方无此目录)+ 渐进式披露 refs |
+| `user-agents/*.md` + `user-agents/refs/` | 新增 9 个全局 agent(官方无此目录)+ 渐进式披露 refs。命名为 `user-agents/` 而非 `agents/`,防止 @skills-dir 插件自动发现导致 agent 重复注册 |
 | `install.sh` / `install.ps1` / `uninstall.sh` / `uninstall.ps1` / `tests/test-install.sh` | 新增:跨平台安装/卸载 + TDD 测试 |
 | `skills/subagent-driven-development/SKILL.md` | implementer/spec-reviewer/code-quality-reviewer → capricorn/scorpio/taurus;加 Aries Gate;删 Prompt Templates |
 | `skills/subagent-driven-development/*-prompt.md` | **已删** |
@@ -95,8 +95,9 @@ bash uninstall.sh
 | `skills/requesting-code-review/code-reviewer.md` | **已删** |
 | `skills/writing-plans/SKILL.md` | Self-Review → 派 libra |
 | `skills/writing-plans/plan-document-reviewer-prompt.md` | **已删** |
-| `skills/brainstorming/SKILL.md` | Spec Self-Review → 派 libra;加 spec-writer 格式 + grill 替代 clarifying questions |
+| `skills/brainstorming/SKILL.md` | Self-Review → 派 libra;加 grill-me 风格 interview(一问一答 + 推荐答案);spec 阶段委托 `writing-spec`;删 cross-platform 段 |
 | `skills/brainstorming/spec-document-reviewer-prompt.md` | **已删** |
+| `skills/writing-spec/SKILL.md` | **新增**:pain-point-driven spec 格式(合并全局 spec-writer),libra 审 + user review gate,handoff 到 writing-plans |
 | 各 SKILL.md | 加 why(禁令+解释风格)、删跨平台段 |
 | `hooks/session-start` | 加 hash-pin(C1 防 SKILL.md 篡改);`hooks/update-skill-hash`、`hooks/.skill-hash` 新增 |
 
