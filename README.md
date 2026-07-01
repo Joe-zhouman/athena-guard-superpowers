@@ -122,6 +122,19 @@ This means the plugin is actually very thin. If you wanted to use these skills w
 
 That said, **this fork does not support other coding agents.** Upstream superpowers targets Claude Code, Codex, Cursor, Gemini CLI, Copilot, OpenCode, and Factory Droid. All of that scaffolding has been stripped out. The skills assume Claude Code's tool set, agent dispatch model, and `@skills-dir` plugin mechanism. Porting to another agent would mean auditing every SKILL.md for harness-specific assumptions — and that work hasn't been done. If you want superpowers on a different agent, use upstream.
 
+### Complementary skills (Matt Pocock)
+
+Four skills from [mattpocock/skills](https://github.com/mattpocock/skills) are bundled as optional supplements. They don't participate in the athena workflow — they're here so you don't have to install them separately:
+
+| Skill | What it does | When to use |
+|-------|-------------|-------------|
+| **diagnosing-bugs** | 6-phase diagnosis loop for hard bugs. Build a tight feedback loop first, then hypothesise, instrument, fix, and regression-test | The bug has no clear repro and you don't know which module is broken. cancer handles bugs with known repros; diagnosing-bugs handles everything else |
+| **handoff** | Compress the current conversation into a handoff document for a fresh agent | You're deep in a session and need to hand off to another agent (or your future self). Writes to OS temp dir |
+| **to-prd** | Synthesize the conversation into a PRD and publish it to the project issue tracker | You need an external-facing PRD from a design session. Requires `/setup-matt-pocock-skills` for issue tracker config |
+| **prototype** | Build a throwaway terminal app or UI variant set to answer a design question, then delete it | Brainstorming alone can't settle a logic/state-model question and you need to *feel* it working. Two branches: logic (CLI) and UI (multi-variant routing) |
+
+These are **pure Matt Pocock**, unmodified. They load alongside athena skills and can be invoked at any time. They don't interfere with the main workflow — they're just there when you need them. Install one more thing, get the whole toolbox.
+
 ### Skill authoring: skill-creator-plus
 
 Upstream bundles `writing-skills`. I use my own **`skill-creator-plus`** (a global user-level skill) for creating and testing skills. That module is not bundled here.
@@ -217,6 +230,12 @@ The orchestration skills use `opus`/`fable` for design and review. Implementatio
 **Meta**
 - **using-superpowers** — Bootstraps the skills system at session start
 
+**Complementary (from mattpocock/skills)**
+- **diagnosing-bugs** — 6-phase loop for hard bugs with no clear repro
+- **handoff** — Compress conversation into a handoff doc for another agent
+- **to-prd** — Synthesize design session into a PRD on the issue tracker
+- **prototype** — Throwaway code to answer a design question, then delete
+
 ### Agents
 
 All 9 agents live in `user-agents/` and install to `~/.claude/agents/` as user-level globals. Full catalog: `docs/athena/OVERVIEW.md`.
@@ -240,7 +259,7 @@ A personal fork of [obra/superpowers](https://github.com/obra/superpowers) rebui
 
 ### File layout
 
-- `skills/` — 14 composable skills, auto-loaded via `@skills-dir`. Bootstrap entry: `skills/using-superpowers/SKILL.md`
+- `skills/` — 18 skills (14 core + 4 complementary from mattpocock/skills), auto-loaded via `@skills-dir`. Bootstrap entry: `skills/using-superpowers/SKILL.md`
 - `user-agents/` — 9 agent `.md` definitions + `refs/` for progressive disclosure. Copied to `~/.claude/agents/` on install, not symlinked. Named `user-agents/` to prevent @skills-dir auto-discovery
 - `hooks/` — SessionStart hook, injects `using-superpowers` bootstrap at every session start
 - `docs/athena/` — Human-facing docs (OVERVIEW.md, INSTALL.md)
@@ -303,7 +322,7 @@ This is just the *plugin overhead*. Your actual code context (source files, test
 
 | Resource | Size | Equivalent |
 |----------|------|------------|
-| 14 skill SKILL.md files | 160 KB | ~40,000 tokens |
+| 18 skill SKILL.md files (14 core + 4 complementary) | 176 KB | ~44,000 tokens |
 | 9 subagent definitions | 77 KB | ~19,000 tokens |
 | 9 progressive-disclosure refs | 22 KB | ~5,500 tokens |
 | **Total on-disk instruction mass** | **~260 KB** | **~65,000 tokens** |
