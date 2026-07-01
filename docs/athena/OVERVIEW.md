@@ -15,20 +15,20 @@
 
 | Guardian | 性格 | 职责 | 接入点 |
 |----------|------|------|--------|
-| [capricorn](../../.claude/agents/capricorn.md) | 纪律执行者 | 实现 single task、vertical-slice TDD、自审、commit | `subagent-driven-development` 的 implementer |
-| [cancer](../../.claude/agents/cancer.md) | 螃钳精准的诊断者 | 修**别人代码**里的 bug:先读、写 failing test 复现、最小修复、regression test 永久 | bug 修复任务(起点是复现/报错,不是 plan) |
-| [scorpio](../../.claude/agents/scorpio.md) | 不信任的审查者 | 审规格符合性、不信报告、独立读码验证 | `subagent-driven-development` 的 spec-reviewer |
-| [taurus](../../.claude/agents/taurus.md) | 不妥协的标准者 | 审代码质量、按行号说话 | `subagent-driven-development` 的 code-quality-reviewer + `requesting-code-review` |
-| [libra](../../.claude/agents/libra.md) | 公正的裁决者 | 审 plan/spec 是否可执行、approve by default | `brainstorming` + `writing-plans` 的 reviewer(替换原 Self-Review) |
+| [capricorn](../../user-agents/capricorn.md) | 纪律执行者 | 实现 single task、vertical-slice TDD、自审、commit | `subagent-driven-development` 的 implementer |
+| [cancer](../../user-agents/cancer.md) | 螃钳精准的诊断者 | 修**别人代码**里的 bug:先读、写 failing test 复现、最小修复、regression test 永久 | bug 修复任务(起点是复现/报错,不是 plan) |
+| [scorpio](../../user-agents/scorpio.md) | 不信任的审查者 | 审规格符合性、不信报告、独立读码验证 | `subagent-driven-development` 的 spec-reviewer |
+| [taurus](../../user-agents/taurus.md) | 不妥协的标准者 | 审代码质量、按行号说话 | `subagent-driven-development` 的 code-quality-reviewer + `requesting-code-review` |
+| [libra](../../user-agents/libra.md) | 公正的裁决者 | 审 plan/spec 是否可执行、approve by default | `brainstorming` + `writing-plans` 的 reviewer(替换原 Self-Review) |
 
 ### 补充四员 — 主 agent 按需派发
 
 | Guardian | 性格 | 职责 | 何时派 |
 |----------|------|------|--------|
-| [virgo](../../.claude/agents/virgo.md) | 留档探索者 | 项目级代码地图、流追踪、模式编目,**写 findings-local.md** | 大项目摸底、跨 session 重建 context |
-| [sagittarius](../../.claude/agents/sagittarius.md) | 追根溯源的研究者 | 外部资料、库怎么用、多源交叉、必引证 | capricorn 报 NEEDS_CONTEXT、外部依赖调研 |
-| [aries](../../.claude/agents/aries.md) | 对抗性的破坏者 | 边界测试、并发混乱、资源耗尽、输入攻击 + **skills/agents/hooks/MCP 对抗审查** | 声称"done"后验证扛得住;改 skills/agents/hooks/MCP 时**强制派** |
-| [pisces](../../.claude/agents/pisces.md) | 克制的润色者 | 文本润色、去 AI 味、代码+非代码 | 已有文档需要听起来像人话 |
+| [virgo](../../user-agents/virgo.md) | 留档探索者 | 项目级代码地图、流追踪、模式编目,**写 findings-local.md** | 大项目摸底、跨 session 重建 context |
+| [sagittarius](../../user-agents/sagittarius.md) | 追根溯源的研究者 | 外部资料、库怎么用、多源交叉、必引证 | capricorn 报 NEEDS_CONTEXT、外部依赖调研 |
+| [aries](../../user-agents/aries.md) | 对抗性的破坏者 | 边界测试、并发混乱、资源耗尽、输入攻击 + **skills/agents/hooks/MCP 对抗审查** | 声称"done"后验证扛得住;改 skills/agents/hooks/MCP 时**强制派** |
+| [pisces](../../user-agents/pisces.md) | 克制的润色者 | 文本润色、去 AI 味、代码+非代码 | 已有文档需要听起来像人话 |
 
 ## 持久化架构(subagent 写盘,主 agent 读盘)
 

@@ -1,13 +1,13 @@
 # athena-superpowers
 
-> Personal fork of [obra/superpowers](https://github.com/obra/superpowers) 5.1.0, rewired to use the 8 athena guardian subagents instead of `general-purpose`, with planning-with-files-style persistence.
+> Personal fork of [obra/superpowers](https://github.com/obra/superpowers) 5.1.0, rewired to use the 9 athena guardian subagents instead of `general-purpose`, with planning-with-files-style persistence.
 
 Superpowers is a complete software development methodology for your coding agents, built on top of a set of composable skills and some initial instructions that make sure your agent uses them.
 
 ## What this fork changes
 
-- **8 single-purpose subagents** in `.claude/agents/` replace `general-purpose` dispatch:
-  - `capricorn` (implementer) / `scorpio` (spec-compliance reviewer) / `taurus` (code-quality reviewer) / `libra` (plan & spec reviewer) — wired into the superpowers flow
+- **9 single-purpose subagents** in `user-agents/` replace `general-purpose` dispatch:
+  - `capricorn` (implementer) / `cancer` (bug-fixer) / `scorpio` (spec-compliance reviewer) / `taurus` (code-quality reviewer) / `libra` (plan & spec reviewer) — wired into the superpowers flow
   - `virgo` (persisting explorer) / `sagittarius` (external researcher) / `aries` (adversarial tester) / `pisces` (text polisher) — dispatched on demand
 - **Deleted the 6 prompt-template files** — each agent carries its own discipline, no inline prompts needed
 - **libra replaces Self-Review** in `brainstorming` and `writing-plans` (you wrote it, you're not the best reviewer of it)
@@ -18,19 +18,29 @@ See `docs/athena/` for the full picture.
 
 ## Install (replaces upstream superpowers)
 
-```bash
-# Remove the upstream plugin
-claude plugin remove superpowers
+First disable the upstream plugin in `~/.claude/settings.json` (both enabled = double SessionStart hook injection, conflicting instructions):
 
-# Add this fork as a local plugin
-claude plugin add /path/to/athena-superpowers
+```json
+"enabledPlugins": { "superpowers@claude-plugins-official": false }
 ```
+
+Then:
+
+```bash
+git clone <this repo> ~/athena-superpowers
+cd ~/athena-superpowers
+bash install.sh
+```
+
+`install.sh` symlinks the repo into `~/.claude/skills/` (hooks + skills load via `@skills-dir`) and copies the 9 agents into `~/.claude/agents/` as user-level globals (plugin-level agents lose `permissionMode`/`mcpServers`; athena agents need those). Start a new session. Full details + verify steps + update workflow: `docs/athena/INSTALL.md`.
+
+Platform: linux now; Windows (`install.ps1`) and macOS later.
 
 ---
 
 ## Quickstart
 
-Give your agent Superpowers: [Claude Code](#claude-code), [Codex CLI](#codex-cli), [Codex App](#codex-app), [Factory Droid](#factory-droid), [Gemini CLI](#gemini-cli), [OpenCode](#opencode), [Cursor](#cursor), [GitHub Copilot CLI](#github-copilot-cli).
+Claude Code only (cross-platform scaffolding removed).
 
 ## How it works
 

@@ -27,9 +27,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$SCRIPT_DIR"
 
 # --- sanity: must be the athena repo ---
-if [[ ! -f "$REPO_ROOT/.claude-plugin/plugin.json" ]] || [[ ! -d "$REPO_ROOT/agents" ]]; then
+if [[ ! -f "$REPO_ROOT/.claude-plugin/plugin.json" ]] || [[ ! -d "$REPO_ROOT/user-agents" ]]; then
   echo "ERROR: $REPO_ROOT does not look like the athena-superpowers repo" >&2
-  echo "       (expected .claude-plugin/plugin.json and agents/)" >&2
+  echo "       (expected .claude-plugin/plugin.json and user-agents/)" >&2
   exit 1
 fi
 
@@ -68,14 +68,14 @@ echo "          hooks + skills auto-load next session (@skills-dir)"
 mkdir -p "$AGENTS_DIR" "$AGENTS_REFS_DIR"
 
 agent_count=0
-for agent in "$REPO_ROOT"/agents/*.md; do
+for agent in "$REPO_ROOT"/user-agents/*.md; do
   [[ -f "$agent" ]] || continue
   cp "$agent" "$AGENTS_DIR/"
   agent_count=$((agent_count + 1))
 done
 
 ref_count=0
-for ref in "$REPO_ROOT"/agents/refs/*.md; do
+for ref in "$REPO_ROOT"/user-agents/refs/*.md; do
   [[ -f "$ref" ]] || continue
   cp "$ref" "$AGENTS_REFS_DIR/"
   ref_count=$((ref_count + 1))

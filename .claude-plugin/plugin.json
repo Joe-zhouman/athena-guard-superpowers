@@ -3,11 +3,11 @@
   "description": "Athena-flavored superpowers: core skills (TDD, debugging, plans) wired to 8 single-purpose subagents (capricorn/scorpio/taurus/libra/virgo/sagittarius/aries/pisces) that persist findings to disk. Forked from obra/superpowers 5.1.0.",
   "version": "5.1.0-athena",
   "author": {
-    "name": "Jesse Vincent",
-    "email": "jesse@fsck.com"
+    "name": "Joe-zhouman",
+    "email": "joe_zm@foxmail.com"
   },
-  "homepage": "https://github.com/obra/superpowers",
-  "repository": "https://github.com/obra/superpowers",
+  "homepage": "https://github.com/Joe-zhouman/athena-guard-superpowers",
+  "repository": "https://github.com/Joe-zhouman/athena-guard-superpowers",
   "license": "MIT",
   "keywords": [
     "skills",

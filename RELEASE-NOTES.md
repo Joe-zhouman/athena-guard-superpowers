@@ -1,5 +1,22 @@
 # Superpowers Release Notes
 
+## v5.1.1-athena (unreleased)
+
+Fork-specific changes by [Joe-zhouman](https://github.com/Joe-zhouman/athena-guard-superpowers).
+
+### Identity
+
+- **Author, homepage, and repository** in `plugin.json` updated to Joe-zhouman / athena-guard-superpowers.
+
+### Fix: agents no longer appear as both plugin agents and global agents
+
+- **`agents/` renamed to `user-agents/`** — Claude Code's `@skills-dir` plugin mechanism auto-discovers any `agents/` directory and registers them as plugin agents (which have `hooks`/`mcpServers`/`permissionMode` stripped). Since athena agents need full capabilities as user-level globals, renaming to `user-agents/` prevents the duplicate registration. Agents now only appear once, as global user-level agents under `~/.claude/agents/`.
+- `install.sh`, `tests/test-install.sh`, `CLAUDE.md`, `README.md`, and `docs/athena/OVERVIEW.md` updated to reference the new directory name.
+
+### New: uninstall script
+
+- `uninstall.sh` reverses everything `install.sh` does: removes the plugin symlink and the 9 agent files + 9 ref files from `~/.claude/agents/`. Only touches files installed by install.sh — other user agents are left alone. Asks for confirmation before removing anything. Idempotent.
+
 ## v5.1.0 (2026-04-30)
 
 ### Removals

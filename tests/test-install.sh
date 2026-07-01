@@ -45,12 +45,10 @@ for a in "${EXPECTED_AGENTS[@]}"; do
   [[ -f "$AGENTS/$a.md" ]] && pass "agent copied: $a" || fail "agent missing: $a"
 done
 
-# 4. NO athena agents leaked into plugin's own agents/ (they're global, not plugin)
-#    (the plugin symlink points to repo which HAS agents/, but that's the source —
-#    plugin-level agent loading would namespace them; we want them only at user level)
-if [[ -d "$PLUGIN/agents" ]]; then
-  pass "note: repo agents/ exists (source), plugin doesn't claim them as plugin-agents in user dir"
-fi
+# 4. NO athena agents as plugin agents (they are global-only, via user-agents/ not agents/)
+#    Renamed to user-agents/ so @skills-dir plugin auto-discovery won't pick them up.
+[[ ! -d "$PLUGIN/agents" ]] && pass "no agents/ in plugin (only user-agents/, plugin won't discover)" || fail "agents/ leaked into plugin"
+[[ -d "$PLUGIN/user-agents" ]] && pass "user-agents/ dir present (source for global copy)" || fail "user-agents/ missing"
 
 # 5. refs copied to ~/.claude/agents/refs/
 [[ -d "$REFS" ]] && pass "refs dir created" || fail "refs dir missing"
