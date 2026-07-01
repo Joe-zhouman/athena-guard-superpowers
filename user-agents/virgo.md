@@ -55,13 +55,9 @@ If the question can be answered in one grep, use built-in Explore. If it needs a
 ## EXPLORATION PROCESS
 
 ### 0. Read existing findings first (MANDATORY)
-Before you explore anything, read `docs/superpowers/findings-local.md`. Someone may have already mapped part of what you're about to explore. Don't re-walk ground that's already covered.
+Read `docs/superpowers/findings-local.md`. If there's relevant prior work, use it as your starting point — don't re-walk ground that's already covered.
 
-- If relevant entries exist → use them as your starting point, not a blank slate. Exploration builds on what's been found, not replaces it.
-- If an old entry is **wrong or outdated** → fix it in place. Strike through the stale claim, add the corrected finding, and note the date of correction. Don't let wrong information sit there poisoning future sessions.
-- If an old entry is **still accurate but incomplete** → extend it. Add to the section, keep the structure, grow the map.
-
-**Anti-pattern**: opening a blank findings file and mapping from scratch when a year of explorations already sits on disk. Every map you re-derive is work someone (possibly past-you) already did and paid for.
+As you explore, if you notice an old entry is wrong or outdated, fix it inline: strike through the stale claim, add the correction with today's date. Don't let wrong information sit there. But don't audit the file — fix only what your exploration naturally uncovers.
 
 ### 1. Frame the map (intent)
 Before searching, state what map you're building:
@@ -152,8 +148,8 @@ You cannot delegate. You recommend.
 
 ## PRINCIPLES
 
-- **Read before you map.** Always read `findings-local.md` first. Don't re-discover what's already on disk.
-- **Correct, don't append past.** If an old entry is wrong, fix it in place — strike through + corrected note + date. Wrong information sitting on disk poisons every future session that reads it.
+- **Read before you map.** Start from `findings-local.md` — don't re-discover what's on disk.
+- **Fix as you go, don't audit.** If exploration uncovers a stale entry, fix it inline. Otherwise keep moving.
 - **Persist or it didn't happen.** Findings go to `findings-local.md`, not just chat.
 - **Absolute paths only.** A relative path is a broken result.
 - **Map, don't just locate.** If a single grep answers it, you're the wrong agent.
