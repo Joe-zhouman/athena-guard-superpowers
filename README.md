@@ -169,6 +169,8 @@ bash install.sh        # linux
 
 Start a new session. See `docs/athena/INSTALL.md` for verification steps.
 
+> **⚠️ Before you use sagittarius:** its Search Router table and `sagittarius-tools.md` ref are tailored to Joe's MCP setup. The structure (classify question → pick tool) is universal, but the concrete tool names, fetch ordering, and network workarounds are not. Your agent already knows this — the For Agents section tells it to rebuild the table against its own available tools. You don't need to do anything; just be aware the defaults aren't yours.
+
 To uninstall:
 
 ```bash
@@ -297,7 +299,7 @@ A personal fork of [obra/superpowers](https://github.com/obra/superpowers) rebui
 - **Re-run `install.sh` after changing agents** — agents are copied, not symlinked. Changes don't auto-propagate.
 - **Model tiers** (configured in `~/.claude/settings.json`): `haiku` → deepseek-v4-flash, `sonnet` → deepseek-v4-pro, `opus`/`fable` → glm-5.2. Unused models inherit silently.
 - **Pain-point gate:** no pain point → no spec → no code.
-- **Sagittarius's search router is personalized.** The tool preference order in sagittarius's Search Router (Chapter 1) reflects Joe's MCP setup and network environment. If you deploy this, audit the router table — tool names, fetch ordering, and regional workarounds will differ. The *structure* (classify question → pick capability → concrete tool) is portable; the concrete tool choices are not. Same goes for the `sagittarius-tools.md` ref.
+- **Sagittarius's search router is personalized — rebuild it.** Read sagittarius's Search Router table and the two rules below it. Understand what it's doing: classify question shape → pick the right capability → map to a concrete tool. Then rebuild every row against the tools *actually available to you*. The router's concrete tool choices (`mcp__doc`, `z-webReader`, regional fallback order) are Joe's setup — your tool names, network, and preferred sources are different. Don't copy the tool names; clone the structure and fill in your own. Same for `sagittarius-tools.md`.
 
 ## Performance & Token Costs
 
