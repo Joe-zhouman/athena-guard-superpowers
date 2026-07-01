@@ -80,7 +80,11 @@ SESSION_ID="$$-$(date +%s)"
 if [[ -n "$PROJECT_DIR" ]]; then
   SESSION_DIR="${PROJECT_DIR}/.superpowers/brainstorm/${SESSION_ID}"
 else
-  SESSION_DIR="/tmp/brainstorm-${SESSION_ID}"
+  # Cross-platform temp dir: TMPDIR (POSIX) > TEMP/TMP (Windows/Git Bash) > /tmp.
+  # On Git Bash, MSYS sets TEMP/TMP to a Windows path (e.g. /c/Users/.../Temp);
+  # on native Unix only TMPDIR is typically set. /tmp is the final fallback.
+  TMP_BASE="${TMPDIR:-${TEMP:-${TMP:-/tmp}}}"
+  SESSION_DIR="${TMP_BASE}/brainstorm-${SESSION_ID}"
 fi
 
 STATE_DIR="${SESSION_DIR}/state"
