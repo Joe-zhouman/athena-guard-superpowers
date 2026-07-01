@@ -1,6 +1,6 @@
 ---
 name: systematic-debugging
-description: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes
+description: Use when you can reproduce a bug but don't know the root cause — a failing test exists or can be written, and you need systematic analysis before touching code. NOT for bugs with no clear repro (use diagnosing-bugs); NOT for bugs you already understand and just need to fix (dispatch cancer directly)
 ---
 
 # Systematic Debugging
