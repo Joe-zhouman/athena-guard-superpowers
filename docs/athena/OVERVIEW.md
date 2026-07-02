@@ -89,13 +89,19 @@ aquarius 只有一个问题:"该不该存在?"编排者指定审什么(plan/spec
 
 ## 完整流程
 
+审查顺序按**失败成本排序**——先审高层次的、容易崩塌的,再审细节:
+
 ```
 brainstorming(主 agent + 用户,用 spec-writer 格式产出 spec)
-    ↓ 派 libra 审 spec(完备性)
-    ↓ 派 aquarius 审 spec(逻辑性,可选——设计太新/太顺时派)
+    ↓ 派 aquarius 审 spec(逻辑性——前提对不对?问题答对了吗?)
+    ↓   ❌ 驳回 → 回到 brainstorming 重写 spec(不是修补)
+    ↓ 派 libra 审 spec(完备性——有没有缺的?能不能执行?)
+    ↓   ❌ 驳回 → 回到 brainstorming 修复
 writing-plans(主 agent 产出 plan)
-    ↓ 派 libra 审 plan(完备性)
-    ↓ 派 aquarius 审 plan(逻辑性,可选——前提可疑时派)
+    ↓ 派 aquarius 审 plan(逻辑性——继承了 spec 的错误前提吗?)
+    ↓   ❌ 驳回 → 回到 writing-plans 重写 plan(不是修补)
+    ↓ 派 libra 审 plan(完备性——task 可执行吗?有没有缺的?)
+    ↓   ❌ 驳回 → 回到 writing-plans 修复
 [对每个 task:]
     ↓
 capricorn 实现(更新 progress.md)
@@ -108,6 +114,10 @@ aquarius 审代码存在性(可选——diff 异常大时派)
     ↓
 aries 对抗测试(可选)→ pisces 润色文档(可选)
 ```
+
+**驳回即重写,不修补。** aquarius 驳回意味着设计的前提假设有根本性问题——在错误的前提上修补就像在地基裂缝上刷漆。回到上一阶段重新来过。
+
+**spec/plan 的所有审查产出都落在 `docs/superpowers/reviews/` 下**——不在 spec 或 plan 目录里。
 
 **bug 修复走平行流程**(不进 brainstorming/writing-plans):
 

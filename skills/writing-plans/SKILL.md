@@ -213,9 +213,25 @@ Every step must contain the actual content an engineer needs. These are **plan f
 - DRY, YAGNI, TDD, frequent commits
 - The implementer does not question the plan. Every decision you defer becomes a decision they guess. Guess wrong.
 
-## Plan Review (dispatch libra, then optionally aquarius)
+## Plan Review (dispatch aquarius, then libra)
 
-You wrote this plan — you are not the best reviewer of it. Dispatch **libra** for an independent read. libra checks only for blocking gaps (missing requirements, contradictions, placeholders, unactionable tasks); its default is APPROVE.
+You wrote this plan — you are not the best reviewer of it. Review happens in two passes, ordered by cost of failure:
+
+**Pass 1 — aquarius (adversarial design review).** aquarius attacks the plan at the highest level: does it inherit flawed premises from the spec? Are there hidden assumptions, causal gaps, or consensus-blind choices? If the plan is built on sand, no amount of completeness checking will save it. Find that out first.
+
+```
+Agent(subagent_type="aquarius",
+      description="Existence audit: <filename>",
+      prompt="Audit the plan at docs/superpowers/plans/<filename>.md. Read the right lens ref for this kind of target, then tag everything that shouldn't exist. Write to docs/superpowers/reviews/<plan-name>-adversarial-plan.md.")
+```
+
+aquarius writes its verdict to `docs/superpowers/reviews/<plan-name>-adversarial-plan.md`. Read it.
+
+**If aquarius finds an unchallenged premise that could collapse the design:** do NOT patch the plan. Return to **writing-plans** and rewrite. aquarius found a foundational problem — tweaking a task won't fix a cracked premise. Rewrite the plan from the corrected assumptions.
+
+**If aquarius says "Lean. Ship.":** proceed to Pass 2.
+
+**Pass 2 — libra (completeness gate).** libra is the final checkpoint — the last pair of eyes before capricorn starts building. Only dispatch after aquarius has confirmed the plan is logically sound. libra checks for blocking gaps; its default is APPROVE.
 
 ```
 Agent(subagent_type="libra",
@@ -225,22 +241,9 @@ Agent(subagent_type="libra",
 
 libra writes its verdict to `docs/superpowers/reviews/<plan-name>-plan-review.md`. Read it.
 
-**If libra finds blockers:** fix the plan, then re-dispatch libra (it re-reads from disk — don't summarize the changes, just fix the file and re-dispatch).
+**If libra finds blockers:** fix the plan, then re-dispatch libra (it re-reads from disk — don't summarize the changes, just fix the file and re-dispatch). If the fixes are substantial, consider re-dispatching aquarius — major rewrites can introduce new assumptions.
 
-**If libra approves:** consider dispatching **aquarius** for an adversarial design review. aquarius does NOT re-check completeness — it attacks the plan's hidden assumptions and logical gaps. Dispatch aquarius when:
-- The problem is novel and the first framing is probably wrong
-- The plan passed libra too cleanly — everything lines up suspiciously well
-- The design involves unfamiliar territory where the consensus might be wrong
-
-```
-Agent(subagent_type="aquarius",
-      description="Existence audit: <filename>",
-      prompt="Audit the plan at docs/superpowers/plans/<filename>.md. Read the right lens ref for this kind of target, then tag everything that shouldn't exist. Write to docs/superpowers/reviews/<plan-name>-adversarial-plan.md.")
-```
-
-aquarius writes its verdict to `docs/superpowers/reviews/<plan-name>-adversarial-plan.md`. Read it. If aquarius finds an unchallenged premise that could collapse the design, return to brainstorming — don't patch the plan around a false premise.
-
-**If both approve:** proceed to execution handoff.
+**If libra approves:** proceed to execution handoff.
 
 ## Execution Handoff
 

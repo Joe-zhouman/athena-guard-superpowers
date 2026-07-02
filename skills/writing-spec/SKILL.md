@@ -162,9 +162,25 @@ A spec that survives this gate has earned the right to become a plan. One that h
 
 **The terminal state is invoking writing-plans.** Do NOT invoke any implementation skill. The ONLY skill you invoke after writing-spec is writing-plans.
 
-## Spec Review (dispatch libra)
+## Spec Review (dispatch aquarius, then libra)
 
-You wrote this spec — you are not the best reviewer of it. Dispatch **libra** for an independent read. libra checks for blocking gaps; its default is APPROVE.
+You wrote this spec — you are not the best reviewer of it. Review happens in two passes, ordered by cost of failure:
+
+**Pass 1 — aquarius (adversarial design review).** aquarius attacks the spec at the highest level: hidden assumptions, framing errors, causal gaps. If the spec is answering the wrong question, no amount of completeness checking will save it. Find that out first — before anyone spends time on details.
+
+```
+Agent(subagent_type="aquarius",
+      description="Existence audit: <filename>",
+      prompt="Audit the spec at docs/superpowers/specs/<filename>.md. Read the right lens ref for this kind of target, then tag everything that shouldn't exist. Write to docs/superpowers/reviews/<spec-name>-adversarial-plan.md.")
+```
+
+aquarius writes its verdict to `docs/superpowers/reviews/<spec-name>-adversarial-plan.md`. Read it.
+
+**If aquarius finds an unchallenged premise that could collapse the design:** do NOT patch the spec. Return to **brainstorming** and rewrite. aquarius found a foundational problem — adding a paragraph won't fix a cracked foundation.
+
+**If aquarius says "Lean. Ship.":** proceed to Pass 2.
+
+**Pass 2 — libra (completeness gate).** libra is the final checkpoint. Only dispatch after aquarius has confirmed the design is logically sound. libra checks for blocking gaps; its default is APPROVE.
 
 ```
 Agent(subagent_type="libra",
@@ -174,7 +190,7 @@ Agent(subagent_type="libra",
 
 libra writes its verdict to `docs/superpowers/reviews/<spec-name>-spec-review.md`. Read it.
 
-**If libra finds blockers:** fix the spec, then re-dispatch libra (it re-reads from disk — fix the file, don't summarize the changes).
+**If libra finds blockers:** fix the spec, then re-dispatch libra (it re-reads from disk — fix the file, don't summarize the changes). If the fixes are substantial, consider re-dispatching aquarius as well — major changes can introduce new assumptions.
 
 **If libra approves:** proceed to the User Review Gate.
 
