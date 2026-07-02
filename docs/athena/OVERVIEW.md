@@ -1,6 +1,6 @@
 # Athena Guardians — Overview
 
-9 个单一职责 subagent,内置于本插件,替换 superpowers 默认的 `general-purpose` 调用。性格驱动,职责从性格长出来。探索/审查/研究的发现**持久化到磁盘**,让大项目能跨 session 重建 context。
+10 个单一职责 subagent,内置于本插件,替换 superpowers 默认的 `general-purpose` 调用。性格驱动,职责从性格长出来。探索/审查/研究的发现**持久化到磁盘**,让大项目能跨 session 重建 context。
 
 ## 设计原则
 
@@ -9,7 +9,7 @@
 3. **持久化**——有"发现"的 agent 把结论写到 `docs/superpowers/`,主 agent 读盘重建 context。
 4. **面向 superpowers 优化**——前 5 个直接对齐 superpowers 流程节点,已在本插件的 SKILL.md 里接好。
 
-## The Nine (9/9)
+## The Ten (10/10)
 
 ### 核心五员 — 已接入 superpowers 流程
 
@@ -21,13 +21,14 @@
 | [taurus](../../user-agents/taurus.md) | 不妥协的标准者 | 审代码质量、按行号说话 | `subagent-driven-development` 的 code-quality-reviewer + `requesting-code-review` |
 | [libra](../../user-agents/libra.md) | 公正的裁决者 | 审 plan/spec 是否可执行、approve by default | `brainstorming` + `writing-plans` 的 reviewer(替换原 Self-Review) |
 
-### 补充四员 — 主 agent 按需派发
+### 补充五员 — 主 agent 按需派发
 
 | Guardian | 性格 | 职责 | 何时派 |
 |----------|------|------|--------|
 | [virgo](../../user-agents/virgo.md) | 留档探索者 | 项目级代码地图、流追踪、模式编目,**写 findings-local.md** | 大项目摸底、跨 session 重建 context |
 | [sagittarius](../../user-agents/sagittarius.md) | 追根溯源的研究者 | 外部资料、库怎么用、多源交叉、必引证 | capricorn 报 NEEDS_CONTEXT、外部依赖调研 |
 | [aries](../../user-agents/aries.md) | 对抗性的破坏者 | 边界测试、并发混乱、资源耗尽、输入攻击 + **skills/agents/hooks/MCP 对抗审查** | 声称"done"后验证扛得住;改 skills/agents/hooks/MCP 时**强制派** |
+| [aquarius](../../user-agents/aquarius.md) | 冷澈的质疑者 | 五个标签审计任何产物的存在性——`delete:` `stdlib:` `native:` `yagni:` `shrink:`。编排者指定审什么(plan/spec/diff)和用什么视角(透镜/梯子) | spec/plan 过了 libra 但"太干净";capricorn diff 异常大或出现新依赖 |
 | [pisces](../../user-agents/pisces.md) | 克制的润色者 | 文本润色、去 AI 味、代码+非代码 | 已有文档需要听起来像人话 |
 
 ## 持久化架构(subagent 写盘,主 agent 读盘)
@@ -44,6 +45,8 @@ docs/superpowers/
     ├── <task>-spec.md          ← scorpio
     ├── <task>-quality.md       ← taurus
     ├── <task>-adversarial.md   ← aries
+    ├── <doc>-adversarial-plan.md ← aquarius(审设计逻辑)
+    ├── <task>-overengineering.md  ← aquarius(审代码存在性)
     ├── <doc>-plan-review.md    ← libra(审 plan)
     └── <doc>-spec-review.md    ← libra(审 spec)
 ```
@@ -58,18 +61,48 @@ docs/superpowers/
 
 单次快查用内置 Explore;要留档的大范围探索用 virgo。
 
+## aquarius vs libra 的分工
+
+| | libra | aquarius |
+|---|---|---|
+| 审查维度 | 完备性:有没有缺的?有没有矛盾的?能不能执行? | 逻辑性:前提成立吗?推理成立吗?问题本身对吗? |
+| 默认姿态 | APPROVE —— 拒绝是例外 | QUESTION —— 每个前提都是嫌疑犯 |
+| 攻击目标 | placeholder、TODO、矛盾需求、不可操作的任务 | 隐藏假设、因果跳跃、共识盲点、框架错误 |
+| 产出 | plan/spec 是否 ready to build | 设计是否 logically sound |
+| 派发时机 | 每次 brainstorming / writing-plans 之后(**必派**) | spec 过了 libra 但设计太新/太顺时(**选派**) |
+
+libra 说"这份文档可以开工了"。aquarius 说"这里头哪些不该存在？"——五个标签一道分。
+
+## aquarius: 一个本能,五个标签
+
+aquarius 只有一个问题:"该不该存在?"编排者指定审什么(plan/spec/diff/依赖列表)和用什么方法(设计审查用五透镜,代码审计用决策梯子)。aquarius 不做分类——他只找不该存在的东西,标记,计分。
+
+| 标签 | 含义 | 替代 |
+|------|------|------|
+| `delete:` | 死代码/投机功能/为以后搭的架子 | 无 |
+| `stdlib:` | 手写轮子,标准库已提供 | 给出库函数名 |
+| `native:` | 代码或依赖做的是平台原生功能 | 给出原生功能名 |
+| `yagni:` | 只有一个实现的抽象/没人改的配置/多余依赖 | 指出已有方案的替代 |
+| `shrink:` | 同样的逻辑,可以更短 | 给出更短写法 |
+
+永远以 `net: -N lines deletable.` 或 `Lean. Ship.` 结尾。
+
 ## 完整流程
 
 ```
 brainstorming(主 agent + 用户,用 spec-writer 格式产出 spec)
-    ↓ 派 libra 审 spec
+    ↓ 派 libra 审 spec(完备性)
+    ↓ 派 aquarius 审 spec(逻辑性,可选——设计太新/太顺时派)
 writing-plans(主 agent 产出 plan)
-    ↓ 派 libra 审 plan
+    ↓ 派 libra 审 plan(完备性)
+    ↓ 派 aquarius 审 plan(逻辑性,可选——前提可疑时派)
 [对每个 task:]
     ↓
 capricorn 实现(更新 progress.md)
     ↓
 scorpio 审规格符合性  →  taurus 审代码质量
+    ↓
+aquarius 审代码存在性(可选——diff 异常大时派)
     ↓
 (卡住:capricorn 报 BLOCKED → 主 agent 派 virgo/sagittarius 调研,结论落 findings-local.md / findings-external.md)
     ↓
@@ -93,7 +126,7 @@ scorpio / taurus / libra 都是**独立 context 审查别人写的**——这是
 ## model 分层
 
 - **fable**(高认知):scorpio + capricorn
-- **sonnet**(常规):cancer / taurus / libra / aries / pisces
+- **sonnet**(常规):cancer / taurus / libra / aries / aquarius / pisces
 - **haiku**(搜索/研究):virgo / sagittarius
 
 不可用的 model 静默回退到 inherit。
@@ -104,8 +137,8 @@ scorpio / taurus / libra 都是**独立 context 审查别人写的**——这是
 
 ### 关键规则
 
-- **持久化是强制的。** virgo 写 `findings-local.md`，sagittarius 写 `findings-external.md`，scorpio/taurus/aries 写 `docs/superpowers/reviews/`，cancer 写 `docs/superpowers/diagnoses/`。主 agent 读盘重建 context。
-- **独立审查不能省略。** libra 审 plan/spec，scorpio 审 spec 符合性，taurus 审代码质量。实现者和审查者必须是不同 agent、不同 context。
+- **持久化是强制的。** virgo 写 `findings-local.md`，sagittarius 写 `findings-external.md`，scorpio/taurus/aries/aquarius 写 `docs/superpowers/reviews/`，cancer 写 `docs/superpowers/diagnoses/`。主 agent 读盘重建 context。
+- **独立审查不能省略。** libra 审 plan/spec 完备性，aquarius 审 plan/spec 逻辑性(可选,选派)，scorpio 审 spec 符合性，taurus 审代码质量。实现者和审查者必须是不同 agent、不同 context。
 - **流程入口是 brainstorming。** 其他流程都从 brainstorming 的输出出发。bug 修复走平行流程（cancer 直接介入），跳过 brainstorming/writing-plans。
-- **子代理 model 分层：** fable → capricorn + scorpio（高认知任务）；sonnet → cancer / taurus / libra / aries / pisces（常规审查和分析）；haiku → virgo / sagittarius（搜索和研究）。不可用的 model 静默回退到 inherit。
+- **子代理 model 分层：** fable → capricorn + scorpio（高认知任务）；sonnet → cancer / taurus / libra / aries / aquarius / pisces（常规审查和分析）；haiku → virgo / sagittarius（搜索和研究）。不可用的 model 静默回退到 inherit。
 - **`general-purpose` 已被完全替换。** 所有调度点都按名字派发。看到 `general-purpose` 就是 bug。

@@ -82,6 +82,7 @@ The 6 prompt-template files were deleted. Each agent IS its own personality and 
 | **virgo** | 处女 | Analytical, meticulous, catalogs everything → **Codebase explorer**: maps architecture, traces flows, persists findings to disk |
 | **sagittarius** | 射手 | Curious, relentless hunter of knowledge → **External researcher**: library docs, API behavior, cited sources |
 | **aries** | 白羊 | Aggressive, impulsive, loves destruction → **Adversarial tester**: boundary values, concurrency chaos, input terrorism |
+| **aquarius** | 水瓶 | Detached, coldly rational, questions what everyone else accepted → **Existence auditor**: five tags (`delete:` `stdlib:` `native:` `yagni:` `shrink:`) to flag what shouldn't exist — in a plan, a spec, a diff, or a dependency list. The orchestrator tells him what to audit and what lens to use. |
 | **pisces** | 双鱼 | Sensitive to texture, can't stand things that sound wrong → **Text polisher**: de-AI-ification, human-sounding prose |
 
 **Planned but not yet implemented:**
@@ -90,8 +91,6 @@ The 6 prompt-template files were deleted. Each agent IS its own personality and 
 |----------|--------|-------------------|--------|
 | **leo** | 狮子 | Performer, showman, commands attention → **Frontend / UI specialist**: layouts, animations, visual polish — the part of development that faces the audience | No pressing need yet, but the personality fit is obvious |
 | **gemini** | 双子 | Mercurial, unpredictable, two brains sharing one mouth → **Wild-card idea guy**: throws out ideas nobody asked for, loves things that are impractical and excessive, will derail a design meeting with "wouldn't it be cool if..." and mean it. The Blizzard designer energy: "It's so coooooooooool!" Not a PM — brainstorming already handles requirement wrangling. Gemini is here to make sure you don't get boring. | Same — I don't have a use case that needs this yet |
-
-**Aquarius (水瓶)** — still thinking. No personality→role click yet.
 
 The roster isn't capped at 12. That's the Gold Saints. *Saint Seiya* has Bronze Saints, Silver Saints, and warriors from entirely different pantheons who show up three arcs later. Same principle here: if a workflow need emerges and I can feel which personality would own it naturally, the seat gets added. Twelve is where the archetypes start, not where they end.
 

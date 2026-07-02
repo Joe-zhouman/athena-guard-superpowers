@@ -24,9 +24,95 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 If the spec covers multiple independent subsystems, it should have been broken into sub-project specs during brainstorming. If it wasn't, suggest breaking this into separate plans — one per subsystem. Each plan should produce working, testable software on its own.
 
+## The Decision Ladder — Before You Design Any Task
+
+**Climb this ladder for every requirement before you write a single task.** The implementer (capricorn) will build whatever the plan says. If the plan says "install flatpickr and write a date picker component," that's what gets built. If the plan says `<input type="date">`, that's what gets built. The implementer does not question the plan — you do. Now.
+
+This is not about writing less code for its own sake. It's about not writing code that doesn't need to exist. Every line you don't write is a line that can't have a bug, can't need a test, can't drift out of date, and can't burn GLM-5.2 quota maintaining it. The plan is the cheapest place to delete code — before anyone writes it.
+
+Stop at the **first rung that holds**. Two rungs both work? Take the higher one.
+
+### Rung 1: Does this need to exist at all?
+
+The most expensive code is the code that solves a problem nobody has.
+
+- Is this requirement solving a **real, confirmed** need, or a speculative one?
+- "We might need it later" → skip it. Later can build it for itself, with real requirements.
+- "The user might want..." → skip it. Wait for the user to want it.
+- If the answer is no: **strike the requirement from the plan.** Don't design a task for it. Say so in one line in the plan: "Skipped: speculative need, add when [specific trigger]."
+
+### Rung 2: Already in this codebase?
+
+Re-implementing what's a few files over is the most common form of bloat.
+
+- Is there a helper, util, type, or pattern that already does this?
+- Has someone else on the team solved this before?
+- **Read the codebase before you answer.** Grep for the concept. Check imports. The function you're about to reinvent is probably in `utils/` with a slightly different name.
+- If yes: the plan says "use existing `foo()` from `src/utils/bar.py`" — not "write a new one."
+
+### Rung 3: Standard library does it?
+
+Your language's stdlib is older than most npm packages and better tested than all of them.
+
+- Check: `pathlib` not `os.path`, `dataclasses` not hand-rolled `__init__`, `itertools` not manual loops, `functools.lru_cache` not a custom cache class.
+- The implementer may not know the stdlib has this. The plan must name it explicitly.
+- If yes: the plan names the exact stdlib function, with an import line.
+
+### Rung 4: Native platform feature covers it?
+
+Browsers and operating systems have been accumulating features for decades. Most "components" are wrappers around something that already works.
+
+- `<input type="date">` over a date picker library. `<details>` over a collapsible component. CSS `grid` over a layout library. Database constraints over application validation code.
+- If yes: the plan says "use native `<input type='date'>`" — and the task has zero npm install steps.
+
+### Rung 5: Already-installed dependency solves it?
+
+Adding a dependency is not free. Every new package is a supply-chain risk, a version conflict waiting to happen, and a thing that will break when the ecosystem moves on. But if the dependency is **already installed**, it's already paid for.
+
+- Check `package.json` / `requirements.txt` / `Cargo.toml` — is there already a package that does this?
+- If not: be extremely reluctant to add one. A new dependency for what 20 lines can do is a bad trade.
+- If yes: the plan uses it. No new installs.
+
+### Rung 6: Can it be one line?
+
+One line has no branches, no edge cases hiding between the lines, no maintenance surface.
+
+- A list comprehension instead of a loop-and-append.
+- A `dict.get(key, default)` instead of an `if key in dict` block.
+- A generator expression instead of building an intermediate list.
+- If yes: the plan shows the one line. The task becomes "add this line at `file:line`."
+
+### Rung 7: Only then — write the minimum that works.
+
+If you've fallen through all six rungs, the code genuinely needs to exist. Now write it — but write the **minimum**:
+
+- No interface with one implementation. No factory for one product. No config for a value that never changes.
+- No scaffolding "for later." Later can scaffold for itself.
+- One file unless two are genuinely justified. Shortest working diff, not shortest line count — a seven-line function with clear error handling beats a one-liner that silently corrupts data.
+
+### The ladder is a reflex, not a research project
+
+You climb it for every requirement, but you don't spend five minutes per rung. Most requirements die at rung 1 or survive to rung 3 or 4 — you'll know within seconds. The rungs exist so you don't skip the obvious question because you were too busy designing the implementation.
+
+### What the plan inherits from the ladder
+
+By the time you write a task, the ladder decision is already baked in:
+
+| If the ladder stopped at... | The task says... |
+|------------------------------|------------------|
+| Rung 1 (doesn't need to exist) | No task. Requirement struck with a one-line note. |
+| Rung 2 (codebase has it) | "Use `foo()` from `src/utils/bar.py`" — exact import path. |
+| Rung 3 (stdlib) | "Use `functools.lru_cache`" — exact function, with import. |
+| Rung 4 (native platform) | "Use `<input type='date'>`" — no code to write. |
+| Rung 5 (existing dependency) | Task names the dependency, shows the import, no `npm install`. |
+| Rung 6 (one line) | Task shows the one line, the exact file, the exact line number. |
+| Rung 7 (must write it) | Normal task — but minimal. |
+
+The implementer should never see a task that says "add a date picker" and have to decide whether to install flatpickr. That decision was yours. You made it at plan time. The task says `<input type="date">` or it says `npm install flatpickr` — never "figure out date input."
+
 ## File Structure
 
-Before defining tasks, map out which files will be created or modified and what each one is responsible for. This is where decomposition decisions get locked in.
+Before defining tasks, map out which files will be created or modified and what each one is responsible for. The decision ladder has already eliminated some requirements and pointed others at existing code — now design the files for what remains.
 
 - Design units with clear boundaries and well-defined interfaces. Each file should have one clear responsibility.
 - You reason best about code you can hold in context at once, and your edits are more reliable when files are focused. Prefer smaller, focused files over large ones that do too much.
@@ -120,12 +206,14 @@ Every step must contain the actual content an engineer needs. These are **plan f
 **Why placeholders are failures, not stubs:** a placeholder looks like the plan is 90% done when it's actually missing the 10% that does the work. The executor can't implement "appropriate error handling" — they don't know which errors, what's appropriate for this codebase, or what the caller expects. So they either guess (producing code that diverges from your intent) or stall (because the step isn't actionable). A plan with placeholders isn't an incomplete plan, it's a non-executable one — and because the placeholders are scattered through otherwise-complete-looking tasks, the plan *reads* as ready and the gap only surfaces at execution time, when rework is most expensive. If you can't write the real content, the design isn't done yet; go back to brainstorming, don't ship a placeholder.
 
 ## Remember
+- **Climb the decision ladder for every requirement** before designing its tasks. The plan is the cheapest place to delete code.
 - Exact file paths always
 - Complete code in every step — if a step changes code, show the code
 - Exact commands with expected output
 - DRY, YAGNI, TDD, frequent commits
+- The implementer does not question the plan. Every decision you defer becomes a decision they guess. Guess wrong.
 
-## Plan Review (dispatch libra)
+## Plan Review (dispatch libra, then optionally aquarius)
 
 You wrote this plan — you are not the best reviewer of it. Dispatch **libra** for an independent read. libra checks only for blocking gaps (missing requirements, contradictions, placeholders, unactionable tasks); its default is APPROVE.
 
@@ -139,7 +227,20 @@ libra writes its verdict to `docs/superpowers/reviews/<plan-name>-plan-review.md
 
 **If libra finds blockers:** fix the plan, then re-dispatch libra (it re-reads from disk — don't summarize the changes, just fix the file and re-dispatch).
 
-**If libra approves:** proceed to execution handoff.
+**If libra approves:** consider dispatching **aquarius** for an adversarial design review. aquarius does NOT re-check completeness — it attacks the plan's hidden assumptions and logical gaps. Dispatch aquarius when:
+- The problem is novel and the first framing is probably wrong
+- The plan passed libra too cleanly — everything lines up suspiciously well
+- The design involves unfamiliar territory where the consensus might be wrong
+
+```
+Agent(subagent_type="aquarius",
+      description="Existence audit: <filename>",
+      prompt="Audit the plan at docs/superpowers/plans/<filename>.md. Read the right lens ref for this kind of target, then tag everything that shouldn't exist. Write to docs/superpowers/reviews/<plan-name>-adversarial-plan.md.")
+```
+
+aquarius writes its verdict to `docs/superpowers/reviews/<plan-name>-adversarial-plan.md`. Read it. If aquarius finds an unchallenged premise that could collapse the design, return to brainstorming — don't patch the plan around a false premise.
+
+**If both approve:** proceed to execution handoff.
 
 ## Execution Handoff
 
