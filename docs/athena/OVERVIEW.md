@@ -19,7 +19,7 @@
 | [cancer](../../user-agents/cancer.md) | 螃钳精准的诊断者 | 修**别人代码**里的 bug:先读、写 failing test 复现、最小修复、regression test 永久 | bug 修复任务(起点是复现/报错,不是 plan) |
 | [scorpio](../../user-agents/scorpio.md) | 不信任的审查者 | 审规格符合性、不信报告、独立读码验证 | `subagent-driven-development` 的 spec-reviewer |
 | [taurus](../../user-agents/taurus.md) | 不妥协的标准者 | 审代码质量、按行号说话 | `subagent-driven-development` 的 code-quality-reviewer + `requesting-code-review` |
-| [libra](../../user-agents/libra.md) | 公正的裁决者 | 审 plan/spec 是否可执行、approve by default | `brainstorming` + `writing-plans` 的 reviewer(替换原 Self-Review) |
+| [libra](../../user-agents/libra.md) | 公正的裁决者 | 审 plan 是否可执行、approve by default | `writing-plans` 的最后一道关卡(替换原 Self-Review) |
 
 ### 补充五员 — 主 agent 按需派发
 
@@ -65,13 +65,12 @@ docs/superpowers/
 
 | | libra | aquarius |
 |---|---|---|
-| 审查维度 | 完备性:有没有缺的?有没有矛盾的?能不能执行? | 逻辑性:前提成立吗?推理成立吗?问题本身对吗? |
+| 审查什么 | plan 的完备性——task 可执行吗?有没有缺的? | spec/plan 的逻辑性——前提成立吗?问题本身对吗? |
 | 默认姿态 | APPROVE —— 拒绝是例外 | QUESTION —— 每个前提都是嫌疑犯 |
-| 攻击目标 | placeholder、TODO、矛盾需求、不可操作的任务 | 隐藏假设、因果跳跃、共识盲点、框架错误 |
-| 产出 | plan/spec 是否 ready to build | 设计是否 logically sound |
-| 派发时机 | 每次 brainstorming / writing-plans 之后(**必派**) | spec 过了 libra 但设计太新/太顺时(**选派**) |
+| 派发位置 | **plan** 阶段,最后一道关卡 | **spec 阶段**(唯一审查者)+ **plan 阶段**(先于 libra) |
+| 产出 | `<name>-plan-review.md` | `<name>-adversarial-plan.md` |
 
-libra 说"这份文档可以开工了"。aquarius 说"这里头哪些不该存在？"——五个标签一道分。
+aquarius 看地基有没有裂缝。libra 看房子能不能住人。spec 阶段只有 aquarius——spec 还在设计层,没到"能不能执行"那一步。
 
 ## aquarius: 一个本能,五个标签
 
@@ -93,10 +92,8 @@ aquarius 只有一个问题:"该不该存在?"编排者指定审什么(plan/spec
 
 ```
 brainstorming(主 agent + 用户,用 spec-writer 格式产出 spec)
-    ↓ 派 aquarius 审 spec(逻辑性——前提对不对?问题答对了吗?)
+    ↓ 派 aquarius 审 spec(前提对不对?问题答对了吗?)
     ↓   ❌ 驳回 → 回到 brainstorming 重写 spec(不是修补)
-    ↓ 派 libra 审 spec(完备性——有没有缺的?能不能执行?)
-    ↓   ❌ 驳回 → 回到 brainstorming 修复
 writing-plans(主 agent 产出 plan)
     ↓ 派 aquarius 审 plan(逻辑性——继承了 spec 的错误前提吗?)
     ↓   ❌ 驳回 → 回到 writing-plans 重写 plan(不是修补)
@@ -148,7 +145,7 @@ scorpio / taurus / libra 都是**独立 context 审查别人写的**——这是
 ### 关键规则
 
 - **持久化是强制的。** virgo 写 `findings-local.md`，sagittarius 写 `findings-external.md`，scorpio/taurus/aries/aquarius 写 `docs/superpowers/reviews/`，cancer 写 `docs/superpowers/diagnoses/`。主 agent 读盘重建 context。
-- **独立审查不能省略。** libra 审 plan/spec 完备性，aquarius 审 plan/spec 逻辑性(可选,选派)，scorpio 审 spec 符合性，taurus 审代码质量。实现者和审查者必须是不同 agent、不同 context。
+- **独立审查不能省略。** aquarius 审 spec(唯一审查者),aquarius + libra 审 plan(先逻辑后完备),scorpio 审 spec 符合性,taurus 审代码质量。实现者和审查者必须是不同 agent、不同 context。
 - **流程入口是 brainstorming。** 其他流程都从 brainstorming 的输出出发。bug 修复走平行流程（cancer 直接介入），跳过 brainstorming/writing-plans。
 - **子代理 model 分层：** fable → capricorn + scorpio（高认知任务）；sonnet → cancer / taurus / libra / aries / aquarius / pisces（常规审查和分析）；haiku → virgo / sagittarius（搜索和研究）。不可用的 model 静默回退到 inherit。
 - **`general-purpose` 已被完全替换。** 所有调度点都按名字派发。看到 `general-purpose` 就是 bug。

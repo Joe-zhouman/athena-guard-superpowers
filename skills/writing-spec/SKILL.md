@@ -130,8 +130,8 @@ digraph writing_spec {
     "Write Design Rationale\n(WHY this way, not just WHAT)" [shape=box];
     "Write Implementation Notes\n(optional fragments, not a plan)" [shape=box];
     "Write Acceptance\n(verifiable, anchored to pain)" [shape=box];
-    "Dispatch libra\n(reads spec from disk)" [shape=box];
-    "libra finds blockers?" [shape=diamond];
+    "Dispatch aquarius\n(reads spec from disk)" [shape=box];
+    "aquarius finds bad premises?" [shape=diamond];
     "User reviews spec?" [shape=diamond];
     "Invoke writing-plans skill" [shape=doublecircle];
 
@@ -139,10 +139,10 @@ digraph writing_spec {
     "Write Problem section first\n(if you can't, stop — no spec needed)" -> "Write Design Rationale\n(WHY this way, not just WHAT)";
     "Write Design Rationale\n(WHY this way, not just WHAT)" -> "Write Implementation Notes\n(optional fragments, not a plan)";
     "Write Implementation Notes\n(optional fragments, not a plan)" -> "Write Acceptance\n(verifiable, anchored to pain)";
-    "Write Acceptance\n(verifiable, anchored to pain)" -> "Dispatch libra\n(reads spec from disk)";
-    "Dispatch libra\n(reads spec from disk)" -> "libra finds blockers?";
-    "libra finds blockers?" -> "Write Design Rationale\n(WHY this way, not just WHAT)" [label="yes\n→ fix → re-dispatch"];
-    "libra finds blockers?" -> "User reviews spec?" [label="no blockers"];
+    "Write Acceptance\n(verifiable, anchored to pain)" -> "Dispatch aquarius\n(reads spec from disk)";
+    "Dispatch aquarius\n(reads spec from disk)" -> "aquarius finds bad premises?";
+    "aquarius finds bad premises?" -> "Write Design Rationale\n(WHY this way, not just WHAT)" [label="yes\n→ back to brainstorming"];
+    "aquarius finds bad premises?" -> "User reviews spec?" [label="Lean. Ship."];
     "User reviews spec?" -> "Write Design Rationale\n(WHY this way, not just WHAT)" [label="changes requested"];
     "User reviews spec?" -> "Invoke writing-plans skill" [label="approved"];
 }
@@ -152,7 +152,7 @@ digraph writing_spec {
 Do NOT invoke writing-plans or any implementation skill until:
 1. The Problem section is written and honest (a real pain point, not a rationalization)
 2. The Design Rationale explains WHY this design, not just WHAT it is
-3. libra has reviewed and approved
+3. aquarius has reviewed and approved
 4. The user has reviewed and approved
 
 A spec that survives this gate has earned the right to become a plan. One that hasn't is a draft — treat it as such.
@@ -162,11 +162,9 @@ A spec that survives this gate has earned the right to become a plan. One that h
 
 **The terminal state is invoking writing-plans.** Do NOT invoke any implementation skill. The ONLY skill you invoke after writing-spec is writing-plans.
 
-## Spec Review (dispatch aquarius, then libra)
+## Spec Review (dispatch aquarius)
 
-You wrote this spec — you are not the best reviewer of it. Review happens in two passes, ordered by cost of failure:
-
-**Pass 1 — aquarius (adversarial design review).** aquarius attacks the spec at the highest level: hidden assumptions, framing errors, causal gaps. If the spec is answering the wrong question, no amount of completeness checking will save it. Find that out first — before anyone spends time on details.
+You wrote this spec — you are not the best reviewer of it. Dispatch **aquarius** for an adversarial design review. aquarius attacks the spec at the highest level: hidden assumptions, framing errors, causal gaps. If the spec is answering the wrong question, no amount of detail checking will save it.
 
 ```
 Agent(subagent_type="aquarius",
@@ -178,21 +176,7 @@ aquarius writes its verdict to `docs/superpowers/reviews/<spec-name>-adversarial
 
 **If aquarius finds an unchallenged premise that could collapse the design:** do NOT patch the spec. Return to **brainstorming** and rewrite. aquarius found a foundational problem — adding a paragraph won't fix a cracked foundation.
 
-**If aquarius says "Lean. Ship.":** proceed to Pass 2.
-
-**Pass 2 — libra (completeness gate).** libra is the final checkpoint. Only dispatch after aquarius has confirmed the design is logically sound. libra checks for blocking gaps; its default is APPROVE.
-
-```
-Agent(subagent_type="libra",
-      description="Review spec: <filename>",
-      prompt="Review the spec at docs/superpowers/specs/<filename>.md. Flag only blockers: (1) Problem section is vague, missing, or describes a non-problem (no real pain point), (2) Design Rationale describes WHAT without explaining WHY this design over alternatives, (3) placeholders/TBDs, (4) internal contradictions, (5) requirements ambiguous enough to build the wrong thing, (6) scope covering multiple independent subsystems.")
-```
-
-libra writes its verdict to `docs/superpowers/reviews/<spec-name>-spec-review.md`. Read it.
-
-**If libra finds blockers:** fix the spec, then re-dispatch libra (it re-reads from disk — fix the file, don't summarize the changes). If the fixes are substantial, consider re-dispatching aquarius as well — major changes can introduce new assumptions.
-
-**If libra approves:** proceed to the User Review Gate.
+**If aquarius says "Lean. Ship.":** proceed to the User Review Gate.
 
 ## User Review Gate
 
@@ -200,7 +184,7 @@ After the spec review loop passes, ask the user to review the written spec:
 
 > "Spec written and saved to `<path>`. Please review it — especially the Problem section. If the pain point doesn't feel right, everything below it needs to change. Let me know if you want any adjustments before we start writing the implementation plan."
 
-Wait for the user's response. If they request changes, make them and re-dispatch libra to re-review the updated spec. Only proceed once the user approves.
+Wait for the user's response. If they request changes, make them and re-dispatch aquarius to re-review the updated spec. Only proceed once the user approves.
 
 ## Handoff
 
@@ -211,6 +195,6 @@ Invoke the **writing-plans** skill to create the implementation plan. Do NOT inv
 - **Pain-point-driven.** No pain point → no spec → no code. The Problem section is the spec's reason to exist.
 - **Design rationale over design description.** WHY, not WHAT. A spec without rationale is a recipe without reasoning.
 - **Every section gates the next.** Problem → Rationale → Notes → Acceptance is a chain of reasoning, not a fill-in-the-blanks form.
-- **Independent review is mandatory.** libra catches what you can't see in your own writing.
+- **Independent review is mandatory.** aquarius catches what you can't see in your own writing.
 - **User signs off before planning.** The spec is the contract; both sides read it before work begins.
 - **Implementation notes are optional fragments, not a plan.** Don't let them grow into pseudocode. That's writing-plans' job.
