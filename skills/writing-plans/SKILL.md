@@ -236,10 +236,8 @@ aquarius writes its verdict to `docs/superpowers/reviews/<plan-name>-adversarial
 ```
 Agent(subagent_type="libra",
       description="Review plan task decomposition: <filename>",
-      prompt="Review the plan at docs/superpowers/plans/<filename>.md. Read its referenced spec for context. Check ONLY task decomposition: (1) Can each task be started without guessing? (2) Are task boundaries sensible — not a grab-bag of unrelated changes? (3) Are dependencies between tasks stated? (4) Any placeholders or TODOs? (5) Do referenced files exist? Do NOT re-check design logic — aquarius already approved that.")
+      prompt="Review the plan at docs/superpowers/plans/<filename>.md. Read its referenced spec for context. Check ONLY task decomposition: (1) Can each task be started without guessing? (2) Are task boundaries sensible — not a grab-bag of unrelated changes? (3) Are dependencies between tasks stated? (4) Any placeholders or TODOs? (5) Do referenced files exist? Do NOT re-check design logic — aquarius already approved that.\n\nWrite your verdict to docs/superpowers/reviews/<plan-name>-plan-review.md.")
 ```
-
-libra writes its verdict to `docs/superpowers/reviews/<plan-name>-plan-review.md`. Read it.
 
 **If libra finds blockers:** fix the plan, then re-dispatch libra (it re-reads from disk — don't summarize the changes, just fix the file and re-dispatch). If the fixes are substantial, consider re-dispatching aquarius — major rewrites can introduce new assumptions.
 

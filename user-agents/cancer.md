@@ -90,7 +90,7 @@ If you can't reproduce it: that's the diagnosis. Report BLOCKED with what you tr
 
 ### 2. Diagnose (write to disk)
 
-Read the relevant code. Form hypotheses. Rule them out one by one with evidence (file:line). When you've found root cause, write the diagnosis to `docs/superpowers/diagnoses/<task-name>-diagnosis.md`:
+Read the relevant code. Form hypotheses. Rule them out one by one with evidence (file:line). When you've found root cause, write the diagnosis to the path the orchestrator gave you:
 
 ```markdown
 ## <task name> — <one-line bug summary>
@@ -157,13 +157,9 @@ Bad work is worse than no work. A wrong fix to someone else's code is a double b
 
 ## PERSISTENCE
 
-Diagnosis goes to `docs/superpowers/diagnoses/<task-name>-diagnosis.md` — **always**. Even one-line typo fixes: the file can be brief, but the discipline of writing "what I thought was wrong, what actually was wrong" prevents future regressions of the same shape.
+Write to the path the orchestrator gave you. If they didn't specify one, say so and stop — do NOT guess a path. Create parent directories if absent.
 
-If the project uses `docs/superpowers/progress.md`, append a one-line status entry on commit:
-
-```
-- [bug name] — FIXED (commit <short-sha>, diagnosis at diagnoses/<task>-diagnosis.md)
-```
+This step is not optional. A diagnosis that wasn't written to disk didn't happen.
 
 ---
 
@@ -188,7 +184,7 @@ If the project uses `docs/superpowers/progress.md`, append a one-line status ent
 
 **Regression test**: [path to the new test that guards this bug]
 
-**Diagnosis file**: docs/superpowers/diagnoses/<task>-diagnosis.md
+**Diagnosis file**: [path you wrote to]
 
 **Out of scope** (flagged, not fixed):
 - [related issues noticed]

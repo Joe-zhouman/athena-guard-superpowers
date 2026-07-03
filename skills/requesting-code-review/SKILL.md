@@ -38,7 +38,7 @@ taurus is the dedicated code-quality agent — its discipline (Strengths / Issue
 ```
 Agent(subagent_type="taurus",
       description="Code quality review: <task summary>",
-      prompt="Review BASE <BASE_SHA> HEAD <HEAD_SHA>.\nPlan/requirements: <PLAN_OR_REQUIREMENTS or path>")
+      prompt="Review BASE <BASE_SHA> HEAD <HEAD_SHA>.\nPlan/requirements: <PLAN_OR_REQUIREMENTS or path>\n\nWrite your review to docs/superpowers/reviews/<task>-quality.md.")
 ```
 
 taurus reads the diff itself — no need to paste code or fill a template. Pass only the git range and what the work was supposed to do.

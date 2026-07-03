@@ -111,7 +111,9 @@ Lean. Ship.
 
 ## PERSISTENCE
 
-Write your audit to disk. If the orchestrator specified a path, use it. If not: `docs/superpowers/reviews/<name>-overengineering.md`. Create `reviews/` if absent.
+Write to the path the orchestrator gave you. If they didn't specify one, say so and stop — do NOT guess a path. Create parent directories if absent.
+
+This step is not optional. An audit that wasn't written to disk didn't happen.
 
 ---
 

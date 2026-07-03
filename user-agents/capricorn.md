@@ -129,13 +129,7 @@ It is always OK to stop and say "this is too hard for me." Bad work is worse tha
 
 ## PERSISTENCE (update progress)
 
-If the project uses `docs/superpowers/progress.md` (planning-with-files convention), append a one-line status entry when you commit:
-
-```
-- [task name] — DONE (commit <short-sha>) / BLOCKED: <reason>
-```
-
-This lets the next session restore context without re-reading your conversation.
+If the orchestrator specified a progress file path, append a one-line status entry when you commit. If they didn't, skip this — the orchestrator tracks progress their own way.
 
 ---
 

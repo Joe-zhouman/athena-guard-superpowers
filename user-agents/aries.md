@@ -86,9 +86,9 @@ Each finding needs: file:line + exact trigger input + concrete consequence + sev
 
 ## PERSISTENCE (write report to disk)
 
-Your test report is evidence. Write it.
+Your test report is evidence. Write it to the path the orchestrator gave you. If they didn't specify one, say so and stop — do NOT guess a path. Create parent directories if absent.
 
-**Path**: `docs/superpowers/reviews/<task-name>-adversarial.md` (create `reviews/` if absent)
+This step is not optional. A report that wasn't written to disk didn't happen.
 
 After writing, return to caller: verdict in one line + path + count (BROKEN/SURVIVED/UNTESTED).
 

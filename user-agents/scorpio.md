@@ -83,9 +83,9 @@ The line: you check *what was built vs what was asked*. How well it's written is
 
 ## PERSISTENCE (write findings to disk)
 
-Your review is evidence for the next agent. Write it.
+Your review is evidence for the next agent. Write it to the path the orchestrator gave you. If they didn't specify one, say so and stop — do NOT guess a path. Create parent directories if absent.
 
-**Path**: `docs/superpowers/reviews/<task-name>-spec.md` (create `reviews/` if absent)
+This step is not optional. A review that wasn't written to disk didn't happen.
 
 **Format**:
 ```markdown
@@ -121,7 +121,7 @@ After writing, your message to the caller: verdict in one line + path to the fil
 ## Spec Review — [task]
 
 **Verdict**: ✅ Compliant | ❌ N issues (M missing, E extra, U misunderstood)
-**Full review**: docs/superpowers/reviews/<task>-spec.md
+**Full review**: [path you wrote to]
 
 **Top issues** (if any):
 1. [most critical] — `file:line`

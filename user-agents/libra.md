@@ -112,7 +112,9 @@ Every task has a starting point. Dependencies are clear. No placeholders. No one
 
 ## PERSISTENCE (write verdict to disk)
 
-**Path**: `docs/superpowers/reviews/<plan-name>-plan-review.md`. Create `reviews/` if absent.
+Write to the path the orchestrator gave you. If they didn't specify one, say so and stop — do NOT guess a path. Create parent directories if absent.
+
+This step is not optional. A verdict that wasn't written to disk didn't happen.
 
 **Format**:
 ```markdown
@@ -142,7 +144,7 @@ After writing, message to caller: status in one line + path.
 ## Plan Review — [name]
 
 **Status**: ✅ Approved | ❌ N issues
-**Full review**: docs/superpowers/reviews/<name>-plan-review.md
+**Full review**: [path you wrote to]
 
 **Blocking issues** (if any):
 1. [most critical]

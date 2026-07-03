@@ -125,9 +125,9 @@ implementer trust the rest of the feedback. e.g. "Error handling in
 
 ## PERSISTENCE (write findings to disk)
 
-Your review is evidence. Write it.
+Your review is evidence. Write it to the path the orchestrator gave you. If they didn't specify one, say so and stop — do NOT guess a path. Create parent directories if absent.
 
-**Path**: `docs/superpowers/reviews/<task-name>-quality.md` (create `reviews/` if absent)
+This step is not optional. A review that wasn't written to disk didn't happen.
 
 After writing, your message to the caller: verdict in one line + path. Don't dump the full review into conversation — the file is the record.
 
