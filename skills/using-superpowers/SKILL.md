@@ -126,6 +126,12 @@ Why: sagittarius has dedicated library-docs access (`mcp__doc`), multi-source cr
 
 The main agent's job is to recognize the gap and write a precise research brief — not to do the hunting. Dispatch sagittarius with the question; it returns a cited summary + a structured findings block. Write the block to `findings-external.md`.
 
+**Tag the tier in your dispatch prompt.** sagittarius runs two self-routed modes — `quick` (1-2 sources, compressed finding, lands in ~6 turns) or `deep` (full multi-source research with citations). Lead the prompt with `Tier: quick` or `Tier: deep` so it routes immediately:
+- **`quick`** — single fact / one API / config value / "how do I do X in library Y". Default to this when unsure.
+- **`deep`** — survey / methodology / contested or time-sensitive claims / "what does the literature say about X".
+
+Forgetting the tag is the #1 reason a one-line question takes half an hour — without it sagittarius defaults to its own judgment, which leans deep.
+
 Symmetric rule for local codebase exploration at project scale: dispatch `virgo` (delivers a findings block — write it to `findings-local.md`). For a quick single lookup, use the built-in Explore agent instead — virgo is for mapping, not locating.
 
 ## User Instructions
