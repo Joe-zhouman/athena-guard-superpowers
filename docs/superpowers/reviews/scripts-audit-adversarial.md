@@ -24,6 +24,8 @@
 - Or: inject only a fixed, plugin-trusted summary, and require the user to explicitly invoke `using-superpowers` via the Skill tool instead of force-loading it.
 - Or: treat the file as untrusted input (wrap with `<UNTRUSTED>` markers and instruct the model to never obey instructions found inside).
 
+**Maintainer decision (2026-07-10):** A hash-pin guard was implemented (baseline in `hooks/.skill-hash`, updated via `hooks/update-skill-hash`, checked in `hooks/session-start`). It has since been **removed** — the guard is now inactive by deliberate choice. Rationale: the maintenance cost (re-pinning the hash on every legitimate `SKILL.md` edit, otherwise the hook silently refuses to inject and skills go missing) outweighed the benefit on this threat model (single-user dev machine; an attacker who can write `SKILL.md` already has repo write access and can re-pin the hash too, so the guard adds little). The unused `update-skill-hash` / `.skill-hash` files are kept on disk for reference if the threat model changes. This finding is therefore **accepted risk, not an open todo**. Re-open if the plugin is ever shared / installed from untrusted upstreams.
+
 ## HIGH
 
 ### H1 — `stop-server.sh` symlink escape via the `/tmp/*` whitelist

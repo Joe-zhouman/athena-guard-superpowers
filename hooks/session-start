@@ -18,25 +18,14 @@ fi
 SKILL_FILE="${PLUGIN_ROOT}/skills/using-superpowers/SKILL.md"
 using_superpowers_content=$(cat "${SKILL_FILE}" 2>&1 || echo "Error reading using-superpowers skill")
 
-# Integrity check: hash-pin the SKILL.md so that a tampered edit
-# (upstream PR merged without review, compromised contributor, malicious
-# dependency update) cannot inject instructions into every future session
-# via this hook. Baseline hash lives at hooks/.skill-hash (git-tracked,
-# intentionally requires a separate deliberate commit to update).
-HASH_FILE="${SCRIPT_DIR}/.skill-hash"
-current_hash=$(printf '%s' "${using_superpowers_content}" | sha256sum | awk '{print $1}')
-integrity_warning=""
-if [[ ! -f "$HASH_FILE" ]]; then
-    # First run on this install — establish baseline. Don't inject yet;
-    # tell the user to run update-skill-hash to pin the current content.
-    integrity_warning="\n\n<important-reminder>⚠️ **INTEGRITY:** No baseline hash found for skills/using-superpowers/SKILL.md. The hook will NOT inject its content until you pin it.\n\n**AGENT ACTION REQUIRED:** You MUST proactively tell the user that the integrity baseline is missing and the using-superpowers skill is not loaded. Tell them to run: \`bash ${SCRIPT_DIR}/update-skill-hash\`, then restart the session. This is a one-time setup step.</important-reminder>"
-    using_superpowers_content=""
-elif [[ "$(cat "$HASH_FILE" | tr -d '[:space:]')" != "$current_hash" ]]; then
-    # Hash mismatch — refuse to inject. This is the prompt-injection guard.
-    integrity_warning="\n\n<important-reminder>⚠️ **INTEGRITY TAMPERING DETECTED:** skills/using-superpowers/SKILL.md does not match its pinned hash. The hook refused to inject the file contents to prevent possible prompt-injection via a tampered skill file.\n\n**AGENT ACTION REQUIRED:** You MUST proactively inform the user about this integrity check failure in your first reply. Explain that the using-superpowers skill is not loaded because the file hash changed. Instruct them to:\n1. Review what changed: \`git diff skills/using-superpowers/SKILL.md\` in the plugin repo (${PLUGIN_ROOT})\n2. If the change is legitimate, run: \`bash ${SCRIPT_DIR}/update-skill-hash\`, then restart the session\n\nThis is not optional — the user will not see this warning unless you report it. If superpowers skills seem unresponsive or missing, this is the likely cause.</important-reminder>"
-    using_superpowers_content=""
-fi
-warning_message="${warning_message}${integrity_warning}"
+# NOTE: This hook previously hash-pinned SKILL.md before injecting (to guard
+# against a tampered edit reaching every session). That guard was removed
+# 2026-07-10 — the maintenance cost (re-pinning the hash on every SKILL.md
+# edit, or the hook silently refuses to inject) outweighed the benefit (a
+# local-attack vector on a single-user dev machine). The unused machinery
+# (hooks/update-skill-hash, hooks/.skill-hash) is kept on disk for reference
+# in case the threat model changes. See docs/superpowers/reviews/
+# scripts-audit-adversarial.md for the original finding and the decision.
 
 # Escape string for JSON embedding using bash parameter substitution.
 # Each ${s//old/new} is a single C-level pass - orders of magnitude
